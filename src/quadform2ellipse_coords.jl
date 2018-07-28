@@ -29,7 +29,7 @@ function quadform2ellipse_coords(psdMatrix; center=[0; 0], numpoints=1000)
         error("Parameter 'center' must be of size 2")
     end
     
-    center = vec(center)
+    center = vec(center);
     if psdMatrix == zeros(2,2)
         return center * ones(1, numpoints)
     end
@@ -44,8 +44,8 @@ function quadform2ellipse_coords(psdMatrix; center=[0; 0], numpoints=1000)
         error("Input matrix must be positive semidefinite");
     end
     
-    theta = linspace(0, 2*pi, numpoints);
-    y = hcat(cos.(theta), sin.(theta))';    # trace out the unit circle
+    theta = vec(linspace(0, 2*pi, numpoints));
+    y = [cos.(theta) sin.(theta)]';         # trace out the unit circle
     invD = elementwise_pseudoinvert(D);
     X = V * (sqrt.(invD) .* y);             # stretch/rotate the circle into an ellipse using Sigma^{-1/2}
     
