@@ -80,7 +80,6 @@ function conic2quad(A, B, C, D, E, F)
     c = 0.25 * b' * beta - F;
 
     S = Q / c;
-
     center = -0.5 * beta;
 
     return S, center
