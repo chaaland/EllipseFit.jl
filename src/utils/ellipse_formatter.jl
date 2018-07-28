@@ -74,14 +74,14 @@ function conic2quad(A, B, C, D, E, F)
     end
 
     Q = [A B/2; B/2 C];
-    b = [C; D];
+    b = [D; E];
 
-    temp = pinv(Q) * b;
-    c = 0.25 * b' * temp - F;
+    beta = pinv(Q) * b;
+    c = 0.25 * b' * beta - F;
 
     S = Q / c;
 
-    center = 0.5 * temp;
+    center = -0.5 * beta;
 
     return S, center
 end
