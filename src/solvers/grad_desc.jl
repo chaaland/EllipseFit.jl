@@ -6,8 +6,9 @@ function grad_desc(input_dim, f, grad; alpha=0.1, xinit=Inf, max_iters=1000, ato
     Args :
         input_dim : dimension of the input to the function to be minimized
         f : a function that takes 'input_dim' inputs and returns a scalar
-        grad : gradient of the function 'f'
+        grad : a function to evaluate the gradient of 'f'
         alpha : the learning rate determining the step size
+        xinit : initial iterate for warm starting
         max_iters : the maximum number of gradient steps to take
         atol : the absolute tolerance of the root mean square of the gradient
 

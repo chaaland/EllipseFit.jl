@@ -10,8 +10,9 @@ function newton_raphson(input_dim, f, J, H; xinit=Inf, max_iters=10, atol=1e-6)
     Args :
         input_dim : dimension of the input to the function to be minimized
         f : a function that takes 'input_dim' inputs and returns a scalar
-        J : jacobian of the function 'f' (i.e. the transpose of the gradient)
+        J : a function to compute the jacobian of 'f' (i.e. the transpose of the gradient)
         H : hessian matrix of the function 'f' (i.e. the jacobian of the gradient)
+        xinit : initial iterate for warm starting
         max_iters : the maximum number of newton steps to take
         atol : the absolute tolerance of the root mean square of the gradient
 
