@@ -2,6 +2,11 @@
 function least_squares_fit(X)
     #= Fit an ellipse to data using least least_squares_fit
 
+    Set up a least squares problem of the form ||A x - b||^2 where 
+    A is the matrix of quadratic and linear terms, x is the vector of
+    the coefficients of the ellipse represented in conic form and b is 
+    a vector of all ones 
+
     Args :
         X : 2 x N or N x 2 matrix containing the data to be fit with an ellipse
             

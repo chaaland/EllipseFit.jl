@@ -1,4 +1,4 @@
-include("utils/rotate_mat2d.jl");
+include("../utils/rotate_mat2d.jl");
 
 function parametric2ellipse_coords(semiaxis_lengths; center=[0 0], ccw_angle=0, numpoints=1000)
     #= Helper for plotting a (possibly degenerate) 2D ellipse given semi-major/minor

@@ -1,4 +1,4 @@
-include("utils/elementwise_pseudoinvert.jl");
+include("../utils/elementwise_pseudoinvert.jl");
 
 function quadform2ellipse_coords(psdMatrix; center=[0; 0], numpoints=1000)
     #= Helper for plotting a (possibly degenerate) 2D ellipse given its quadratic form
