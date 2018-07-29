@@ -1,4 +1,4 @@
-include("../utils/elementwise_pseudoinvert.jl");
+include("elementwise_pseudoinvert.jl");
 
 function quadform2ellipse_coords(psdMatrix; center=[0; 0], numpoints=1000)
     #= Helper for plotting a (possibly degenerate) 2D ellipse given its quadratic form
@@ -21,11 +21,11 @@ function quadform2ellipse_coords(psdMatrix; center=[0; 0], numpoints=1000)
     =#
     
 
-    if psdMatrix != psdMatrix'
+    if !(psdMatrix ≈ psdMatrix')
         error("Parameter 'psdMatrix' must be symmetric");
     elseif size(psdMatrix) != (2,2)
         error("Parameter 'psdMatrix' must be (2,2)")
-    elseif size(vec(center))[0] != 2
+    elseif size(vec(center))[1] != 2
         error("Parameter 'center' must be of size 2")
     end
     
