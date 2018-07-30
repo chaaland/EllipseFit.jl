@@ -1,8 +1,9 @@
 <a name="logo"/>
-<div align="left">
-<img src="https://raw.githubusercontent.com/chaaland/EllipseFit.jl/master/img/logo.png" alt="Logo" width="200" height="200"></img>
+<div align="center">
+<img src="https://raw.githubusercontent.com/chaaland/EllipseFit.jl/master/img/logo.png" alt="Logo" width="100" height="100"></img>
 </a>
 </div>
+
 # EllipseFit
 *Ellipse fitting and plotting in Julia*
 
