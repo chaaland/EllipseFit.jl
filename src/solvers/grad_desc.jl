@@ -18,13 +18,14 @@ function grad_desc(input_dim, f, grad; alpha=0.1, xinit=Inf, max_iters=1000, ato
         gradnorm : the norm of the gradient along the trajectory
 
     =#
-
-    if xinit == Inf
-        xvals = randn((input_dim, 1));
+    
+    xvals = xinit;
+    if isinf(xinit)
+        xvals = vec(randn(input_dim));
     end
 
-    xvals = xinit;
     fvals = f(xvals);
+
     g = grad(xvals);
     gradnorm = norm(g);
 

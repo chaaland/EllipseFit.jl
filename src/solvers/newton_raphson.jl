@@ -41,8 +41,14 @@ function newton_raphson(input_dim, f, J, H; xinit=Inf, max_iters=10, atol=1e-6)
         g = J(xcurr)';
         h = H(xcurr);
         gradnorm = vcat(gradnorm, norm(g));
+        print(gradnorm)
+        print(g)
+        println(xvals)
+        println(rmse(g))
         if rmse(g) <= atol
             break
         end
     end
+    
+    return xvals, fvals, gradnorm
 end
