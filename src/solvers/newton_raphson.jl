@@ -1,5 +1,6 @@
 include("../utils/rmse.jl")
 
+
 function newton_raphson(input_dim, f, J, H; xinit=Inf, max_iters=10, atol=1e-6)
     #= Use the newton raphson method to find extrema
     
@@ -34,17 +35,23 @@ function newton_raphson(input_dim, f, J, H; xinit=Inf, max_iters=10, atol=1e-6)
     gradnorm = norm(g);
 
     for i=1:max_iters
-        newton_step = - h \ g;
-        xcurr = xvals[:,i] + newton_step;
+        if input_dim == 1
+            if h ≈ 0.0
+                break
+            end
+            newton_step = - g / h;
+            xcurr = xvals[i] + newton_step;
+        else
+            newton_step = - h \ g;
+            xcurr = xvals[:,i] + newton_step;
+        end
+        
         xvals = hcat(xvals, xcurr);
         fvals = vcat(fvals, f(xcurr));
         g = J(xcurr)';
         h = H(xcurr);
         gradnorm = vcat(gradnorm, norm(g));
-        print(gradnorm)
-        print(g)
-        println(xvals)
-        println(rmse(g))
+
         if rmse(g) <= atol
             break
         end

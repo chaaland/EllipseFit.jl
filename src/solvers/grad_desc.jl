@@ -1,5 +1,6 @@
 include("../utils/rmse.jl")
 
+
 function grad_desc(input_dim, f, grad; alpha=0.1, xinit=Inf, max_iters=1000, atol=1e-6)
     #= Perform gradient descent to find minimum of a function
     
@@ -25,7 +26,6 @@ function grad_desc(input_dim, f, grad; alpha=0.1, xinit=Inf, max_iters=1000, ato
     end
 
     fvals = f(xvals);
-
     g = grad(xvals);
     gradnorm = norm(g);
 
