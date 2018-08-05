@@ -1,7 +1,7 @@
 include("../utils/rmse.jl");
 
 
-function levenberg_marquardt(input_output_shape, f, J; xinit=Inf, max_iters=1000, atol=1e-6)
+function levenberg_marquardt(input_output_shape::Tuple{T,T}, f::Function, J::Function; xinit=Inf, max_iters=1000, atol=1e-6) where T <: Int64
     #= Implements the levenberg marquardt heuristic for finding roots of m nonlinear equations in n unknowns
     
     Args :
@@ -24,26 +24,27 @@ function levenberg_marquardt(input_output_shape, f, J; xinit=Inf, max_iters=1000
     n = input_output_shape[1];
     m = input_output_shape[2];
 
-    if isinf(xinit)
+    if any(isinf.(xinit))                 
         xinit = vec(randn(n));
     end
     
-    lambdavals = hcat(1);
+    lambdavals = [1];
     xvals = hcat(xinit);
-    xcurr = xinit;
-    fvals = hcat(f(xvals));
-    total_deriv = J(xvals);
+    xcurr = vec(xvals);
+    fvals = vcat(f(xcurr));
+
+    total_deriv = J(xcurr);
     gradnorm = norm(total_deriv);
 
     for i in 1:max_iters
         while true
             if m == 1
-                A = total_deriv^2 + lambdavals[i];          
-                b = total_deriv * fvals[i];
+                A = total_deriv[1]^2 + lambdavals[i];          
+                b = total_deriv[1] * fvals[i];
                 lm_step = b / A ;
                 xcurr = xvals[i] - lm_step;
             else
-                A = total_deriv' * total_deriv + lambdavals[i] * eye(n, n);          
+                A = total_deriv' * total_deriv + lambdavals[i] * eye(n, n); 
                 b = total_deriv' * fvals[:,i];
                 lm_step = A \ b;
                 xcurr = xvals[:,i] - lm_step;
@@ -60,7 +61,7 @@ function levenberg_marquardt(input_output_shape, f, J; xinit=Inf, max_iters=1000
         xvals = hcat(xvals, xcurr);
         fvals = hcat(fvals, f(xcurr));
         total_deriv = J(xcurr); 
-        gradnorm = vcat(gradnorm, norm(total_deriv));
+        gradnorm = hcat(gradnorm, norm(total_deriv));
         if rmse(total_deriv) <= atol
             break
         end

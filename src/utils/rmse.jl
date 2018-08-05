@@ -1,5 +1,5 @@
 
-function rmse(x; y=0)
+function rmse(x::AbstractArray; y=0)
     #= Computes the root mean square error between x and y 
 
     Given two vectors x and y, return 

@@ -1,7 +1,7 @@
 include("../utils/rmse.jl")
 
 
-function grad_desc(input_dim, f, grad; alpha=0.1, xinit=Inf, max_iters=1000, atol=1e-6)
+function grad_desc(input_dim::T, f::Function, grad::Function; alpha=0.1, xinit=Inf, max_iters=1000, atol=1e-6) where T <: Int64
     #= Perform gradient descent to find minimum of a function
     
     Args :
@@ -20,21 +20,28 @@ function grad_desc(input_dim, f, grad; alpha=0.1, xinit=Inf, max_iters=1000, ato
 
     =#
     
-    xvals = xinit;
-    if isinf(xinit)
-        xvals = vec(randn(input_dim));
+    if any(isinf.(xinit))                 
+        xinit = vec(randn(input_dim));
     end
 
+    xvals = hcat(xinit);
+    xcurr = xvals;
     fvals = f(xvals);
     g = grad(xvals);
     gradnorm = norm(g);
 
     for i in 1:max_iters
-        xcurr = xvals[:,i] - alpha * g;
+        if input_dim == 1
+            xcurr = xvals[i] - alpha * g;
+        else
+            xcurr = xvals[:,i] - alpha * g;
+        end
+
         xvals = hcat(xvals, xcurr);
         fvals = vcat(fvals, f(xcurr));
         g = grad(xcurr); 
         gradnorm = vcat(gradnorm, norm(g));
+
         if rmse(g) <= atol
             break
         end

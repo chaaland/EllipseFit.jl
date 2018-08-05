@@ -1,4 +1,5 @@
-function vandermonde(x, n)
+
+function vandermonde(x::Array{T,1}, n) where T <: Real
     #= Generates a vandermonde matrix using the entries of x
     Given a vector x, the successive powers of x up to and including n
     are computed and stored as rows of a matrix

@@ -1,6 +1,7 @@
 include("rotate_mat2d.jl");
 
-function parametric2ellipse_coords(semiaxis_lengths; center=[0 0], ccw_angle=0, numpoints=1000)
+
+function parametric2ellipse_coords(semiaxis_lengths::AbstractArray; center=[0 0], ccw_angle=0, numpoints=1000)
     #= Helper for plotting a (possibly degenerate) 2D ellipse given semi-major/minor
     axes lengths, ellipse center coordinates and angle off the positive x axis
     

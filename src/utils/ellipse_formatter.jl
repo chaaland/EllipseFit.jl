@@ -1,7 +1,8 @@
 include("elementwise_pseudoinvert.jl")
 include("rotate_mat2d.jl")
 
-function quad2conic(S; center=[0 0])
+
+function quad2conic(S::AbstractArray; center=[0 0])
     #= Helper for converting quadratic form ellipse into a standard conic form
     
     Given an ellipse as a quadratic form

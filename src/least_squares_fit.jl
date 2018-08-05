@@ -1,5 +1,5 @@
 
-function least_squares_fit(X)
+function least_squares_fit(X::Array{T,2}) where T <: Real
     #= Fit an ellipse to data using least least_squares_fit
 
     Set up a least squares problem of the form ||A x - b||^2 where 

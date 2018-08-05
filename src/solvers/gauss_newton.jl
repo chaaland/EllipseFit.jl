@@ -1,6 +1,9 @@
 include("../utils/rmse.jl")
 
-function gauss_newton(input_dim, f, J; xinit=Inf, max_iters=1000, atol=1e-6)
+
+
+#function levenberg_marquardt(input_output_shape::Tuple{Int64,Int64}, f::Function, J::Function; xinit=Inf, max_iters=1000, atol=1e-6)
+function gauss_newton(input_output_shape::Tuple{Int64,Int64}, f::Function, J::Function; xinit=Inf, max_iters=1000, atol=1e-6)
     #= Use the gauss-newton method to find extrema
     
     The Gauss-Newton method is used to approximately solve the non-linear least
@@ -22,23 +25,36 @@ function gauss_newton(input_dim, f, J; xinit=Inf, max_iters=1000, atol=1e-6)
 
     =#
 
-    if xinit == Inf
-        xinit = randn((input_dim, 1))
-    end
+    n = input_output_shape[1];
+    m = input_output_shape[2];
 
-    xvals = xinit;
-    fvals = f(xvals);
-    total_deriv = J(xvals);
-    gradnorm = norm(total_deriv)
+    if any(isinf.(xinit))                 
+        xinit = vec(randn(n));
+    end
+    
+    xvals = hcat(xinit);
+    xcurr = vec(xvals);
+    fvals = vcat(f(xcurr));
+
+    total_deriv = J(xcurr);
+    gradnorm = norm(total_deriv);
 
     for i=1:max_iters
-        gn_descent_direction = - (total_deriv' * total_deriv) \ (total_deriv * fvals)
-        xcurr = xvals[:,i] + gn_descent_direction;
+        if m == 1
+            gn_step = fvals / total_deriv[0];
+            xcurr = xvals[i] - gn_step;
+        else
+            A = total_deriv' * total_deriv; 
+            b = total_deriv' * fvals[:,i];
+            gn_step = A \ b;
+            xcurr = xvals[:,i] - gn_step;
+        end
+
         xvals = hcat(xvals, xcurr);
         fvals = vcat(fvals, f(xcurr));
         total_deriv = J(xcurr);
-        gradnorm = vcat(gradnorm, norm(g));
-        if rmse(g) <= atol
+        gradnorm = vcat(gradnorm, norm(total_deriv));
+        if rmse(total_deriv) <= atol
             break
         end
     end

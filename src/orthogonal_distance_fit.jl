@@ -1,5 +1,5 @@
 
-function orthogonal_dist_fit(X)
+function orthogonal_dist_fit(X::Array{T,2}) where T <: Real
     #= Fit an ellipse by minimizing the orthogonal distance of the points 
 
     Rather than least squares, the ellipse is fit so as to minimize the 

@@ -1,7 +1,7 @@
 include("../utils/rmse.jl")
 
 
-function newton_raphson(input_dim, f, J, H; xinit=Inf, max_iters=10, atol=1e-6)
+function newton_raphson(input_dim::T, f::Function, J::Function, H::Function; xinit=Inf, max_iters=10, atol=1e-6) where T <: Int64
     #= Use the newton raphson method to find extrema
     
     The Newton-Raphson method takes into account second order information to 
@@ -24,13 +24,17 @@ function newton_raphson(input_dim, f, J, H; xinit=Inf, max_iters=10, atol=1e-6)
 
     =#
 
-    if xinit == Inf
-        xinit = randn((input_dim, 1))
+    if any(isinf.(xinit))                 
+        xinit = vec(randn(input_dim));
     end
+    
+    xvals = hcat(xinit);
+    xcurr = vec(xvals);
+    fvals = vcat(f(xcurr));
 
     xvals = xinit;
     fvals = f(xvals);
-    g = J(xvals)';
+    g = vec(J(xvals));
     h = H(xvals);
     gradnorm = norm(g);
 

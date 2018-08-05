@@ -1,5 +1,5 @@
 
-function elementwise_pseudoinvert(v, tol=1e-10)
+function elementwise_pseudoinvert(v::AbstractArray, tol=1e-10) 
     #= Helper for elementwise inversion of a matrix v
     
     Inverts the non-zero elements of v and keeps the 0 elements. 

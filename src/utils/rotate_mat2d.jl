@@ -1,5 +1,5 @@
 
-function rotate_mat2d(angle; ccw=true)
+function rotate_mat2d(angle::Real; ccw=true)
     #= Helper for rotating points in 2d space
     
     Builds the rotation matrix specified by the angle and the direction of rotation
