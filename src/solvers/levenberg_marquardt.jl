@@ -1,7 +1,7 @@
 include("../utils/rmse.jl");
 
 
-function levenberg_marquardt(input_output_shape::Tuple{T,T}, f::Function, J::Function; xinit=Inf, max_iters=1000, atol=1e-6) where T <: Int64
+function levenberg_marquardt(input_output_shape::Tuple{Int64,Int64}, f::Function, J::Function; xinit=Inf, max_iters=1000, atol=1e-6)
     #= Implements the levenberg marquardt heuristic for finding roots of m nonlinear equations in n unknowns
     
     Args :
@@ -34,7 +34,7 @@ function levenberg_marquardt(input_output_shape::Tuple{T,T}, f::Function, J::Fun
     fvals = vcat(f(xcurr));
 
     total_deriv = J(xcurr);
-    gradnorm = norm(total_deriv);
+    gradnorm = rmse(2*total_deriv' * f(xcurr));
 
     for i in 1:max_iters
         while true
@@ -61,8 +61,8 @@ function levenberg_marquardt(input_output_shape::Tuple{T,T}, f::Function, J::Fun
         xvals = hcat(xvals, xcurr);
         fvals = hcat(fvals, f(xcurr));
         total_deriv = J(xcurr); 
-        gradnorm = hcat(gradnorm, norm(total_deriv));
-        if rmse(total_deriv) <= atol
+        gradnorm = hcat(gradnorm, rmse(2*total_deriv' * f(xcurr)));
+        if rmse(2*total_deriv' * f(xcurr)) <= atol
             break
         end
     end
