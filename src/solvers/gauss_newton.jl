@@ -1,8 +1,6 @@
 include("../utils/rmse.jl")
 
 
-
-#function levenberg_marquardt(input_output_shape::Tuple{Int64,Int64}, f::Function, J::Function; xinit=Inf, max_iters=1000, atol=1e-6)
 function gauss_newton(input_output_shape::Tuple{Int64,Int64}, f::Function, J::Function; xinit=Inf, max_iters=1000, atol=1e-6)
     #= Use the gauss-newton method to find extrema
     
@@ -51,11 +49,14 @@ function gauss_newton(input_output_shape::Tuple{Int64,Int64}, f::Function, J::Fu
         end
 
         xvals = hcat(xvals, xcurr);
-        fvals = vcat(fvals, f(xcurr));
+        fvals = hcat(fvals, f(xcurr));
         total_deriv = J(xcurr);
-        gradnorm = vcat(gradnorm, norm(total_deriv));
-        if rmse(total_deriv) <= atol
+        gradnorm = hcat(gradnorm, norm(total_deriv));
+
+        if rmse(total_deriv' * f(xcurr)) <= atol
             break
         end
     end
+    
+    return xvals, fvals, gradnorm
 end
