@@ -52,7 +52,7 @@ function gauss_newton(input_output_shape::Tuple{Int64,Int64}, f::Function, J::Fu
         fvals = hcat(fvals, f(xcurr));
         total_deriv = J(xcurr);
         gradnorm = hcat(gradnorm, rmse(2*total_deriv' * f(xcurr)));
-        if rmse(2*total_deriv' * f(xcurr)) <= atol
+        if rmse(2*total_deriv' * f(xcurr)) <= atol                   # From grad ||f(x)||^2
             break
         end
     end

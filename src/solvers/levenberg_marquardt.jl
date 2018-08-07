@@ -49,7 +49,7 @@ function levenberg_marquardt(input_output_shape::Tuple{Int64,Int64}, f::Function
                 lm_step = A \ b;
                 xcurr = xvals[:,i] - lm_step;
             end
-
+            
             if sum(f(xcurr).^2) > sum(fvals[:,i].^2)
                 lambdavals[i] = 2 * lambdavals[i];
             else
@@ -62,7 +62,7 @@ function levenberg_marquardt(input_output_shape::Tuple{Int64,Int64}, f::Function
         fvals = hcat(fvals, f(xcurr));
         total_deriv = J(xcurr); 
         gradnorm = hcat(gradnorm, rmse(2*total_deriv' * f(xcurr)));
-        if rmse(2*total_deriv' * f(xcurr)) <= atol
+        if rmse(2*total_deriv' * f(xcurr)) <= atol                   # From grad ||f(x)||^2
             break
         end
     end
