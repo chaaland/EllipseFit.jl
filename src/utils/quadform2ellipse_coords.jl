@@ -1,6 +1,6 @@
 using LinearAlgebra;
 
-include("elementwise_pseudoinvert.jl");
+include("utils.jl");
 
 
 function quadform2ellipse_coords(S::AbstractArray; center=[0; 0], numpoints=1000)

@@ -1,7 +1,8 @@
-include("../src/utils/rotate_mat2d.jl");
-
-
 using PyPlot
+using EllipseFit
+
+# include("../src/utils/rotate_mat2d.jl");
+
 
 function noisy_ellipse(semiaxis_lengths; center=[0 0], ccw_angle=0, numpoints=50)
     #= Example function for plotting data roughly corresponding to an ellipse plus noise

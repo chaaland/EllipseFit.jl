@@ -1,3 +1,4 @@
+using Random;
 using Statistics;
 
 function rmse(x::AbstractArray; y=0)
@@ -62,4 +63,50 @@ function vandermonde(x::Vector{T}, degree) where T <: Real
     end
 
     return A
+end
+
+function elementwise_pseudoinvert(v::AbstractArray, tol=1e-10) 
+    #= Helper for elementwise inversion of a matrix v
+    
+    Inverts the non-zero elements of v and keeps the 0 elements. 
+    Elements within tol of 0 are treated as zero
+    
+    Args :
+        v : an array to take the reciprocal of
+        tol : tolerance for setting an element to zero
+    
+    Returns :
+        Array with the elements inverted except the zeros
+    =#
+
+    m = maximum(abs.(v));
+    v = v ./ m;
+    reciprocal = 1 ./ v;
+    reciprocal[abs.(reciprocal) .>= 1/tol] .= 0;   
+
+    return reciprocal / m;
+end
+
+function random_ellipse(numpoints=50)
+    #= Example function for plotting data roughly corresponding to an ellipse plus noise
+
+    Helper function used to generate noisy ellipse data with sample points drawn from 
+    a uniform radial distribution
+
+    Args :
+        num_points : an integer indicating the number of xy pairs on the ellipse to return    
+    Returns :
+        A 2 x numpoints array where the x and y coordinates are in the 1st and 2nd row 
+        respectively
+    =# 
+
+    semiaxis_lengths = vec(rand(1:10,2))
+    center = vec(rand(-2:2, 2));
+    ccw_angle = 2 * pi * rand();
+
+    theta = 2 * pi * vec(rand(numpoints));
+    onaxis_ellipse = semiaxis_lengths .* [cos.(theta) sin.(theta)]';
+    epsilon = 0.3 * randn(2, numpoints);
+    
+    return  center' .+ rotate_mat2d(ccw_angle) * onaxis_ellipse' + epsilon'
 end

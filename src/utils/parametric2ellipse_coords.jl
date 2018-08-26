@@ -1,4 +1,4 @@
-include("rotate_mat2d.jl");
+include("utils.jl");
 
 
 function parametric2ellipse_coords(semiaxis_lengths::Vector{T}; center=[0 0], ccw_angle=0, numpoints=1000) where T <: Real
@@ -20,7 +20,7 @@ function parametric2ellipse_coords(semiaxis_lengths::Vector{T}; center=[0 0], cc
         num_points : an integer indicating the number of xy pairs on the ellipse to return
     
     Returns :
-        A 2 x numpoints array where the x and y coordinates are in the 1st and 2nd row 
+        A numpoints x 2 array where the x and y coordinates are in the 1st and 2nd row 
         respectively
     =#
 
@@ -37,5 +37,5 @@ function parametric2ellipse_coords(semiaxis_lengths::Vector{T}; center=[0 0], cc
     theta = vec(range(0, stop=2*pi, length=numpoints));
     onaxis_ellipse = semiaxis_lengths .* [cos.(theta) sin.(theta)]';
     
-    return center .+ rotate_mat2d(ccw_angle) * onaxis_ellipse;
+    return center' .+ rotate_mat2d(ccw_angle) * onaxis_ellipse';
 end

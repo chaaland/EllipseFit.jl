@@ -1,4 +1,4 @@
-include("../utils/rmse.jl")
+include("../utils/utils.jl")
 
 
 function gauss_newton(input_output_shape::Tuple{Int64,Int64}, f::Function, J::Function;

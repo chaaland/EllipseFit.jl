@@ -1,9 +1,9 @@
 # include("../src/utils/quadform2ellipse_coords.jl");
-include("../src/utils/rotate_mat2d.jl");
+# include("../src/utils/utils.jl");
 
 using PyPlot
 using Distributions
-using EllipsePlot
+using EllipseFit
 
 #= 
 Small script demonstrating how to use the module to plot ellipses. 
@@ -19,7 +19,6 @@ V = rotate_mat2d(pi/3);
 D = diagm(0 => vec([3/4 1/4]));
 covariance = V * D * V';
 precision = inv(covariance);
-
 
 # Specify mean and degrees of freedom for distribution
 mu = [-1 0.5];

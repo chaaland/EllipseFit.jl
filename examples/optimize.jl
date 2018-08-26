@@ -2,10 +2,10 @@ include("../src/utils/vandermonde.jl")
 include("../src/solvers/grad_desc.jl")
 include("../src/solvers/newton_raphson.jl")
 
-
 using PyPlot
+using Random
 
-srand(1)
+Random.seed!(1)
 
 z = vec(rand(-5:5,2));
 A = vandermonde(randn(10), 1);

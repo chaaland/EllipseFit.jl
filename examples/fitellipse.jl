@@ -1,9 +1,9 @@
-include("noisy_ellipse.jl")
-include("../src/least_squares_fit.jl")
-include("../src/utils/quadform2ellipse_coords.jl")
-include("../src/utils/ellipse_formatter.jl")
-
 using PyPlot
+using EllipseFit
+
+include("utils.jl")
+# include("../src/least_squares_fit.jl")
+# include("../src/utils/utils.jl")
 
 #= 
 Small example script demonstrating how to use the module to fit an ellipse
@@ -11,7 +11,7 @@ to data. We generate random ellipse data with noise and fit an ellipse to
 the data.
 =#
 
-X = noisy_ellipse([3 2], center = [1 -1], ccw_angle=-pi/3, numpoints=100);
+X = random_ellipse([3 2], center = [1 -1], ccw_angle=-pi/3, numpoints=100);
 A, B, C, D, E, F = least_squares_fit(X);
 S, center = conic2quad(A, B, C, D, E, F);
 

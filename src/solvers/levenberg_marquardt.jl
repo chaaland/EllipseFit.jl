@@ -1,4 +1,4 @@
-include("../utils/rmse.jl");
+include("../utils/utils.jl");
 
 
 function levenberg_marquardt(input_output_shape::Tuple{Int64,Int64}, f::Function, J::Function; xinit=Inf, max_iters=1000, atol=1e-6)

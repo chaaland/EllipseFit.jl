@@ -1,4 +1,4 @@
-include("../utils/rmse.jl")
+include("../utils/utils.jl")
 
 
 function newton_raphson(input_dim::T, f::Function, J::Function, H::Function; 

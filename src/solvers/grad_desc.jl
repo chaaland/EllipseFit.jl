@@ -1,4 +1,4 @@
-include("../utils/rmse.jl")
+include("../utils/utils.jl")
 
 
 function grad_desc(input_dim::T, f::Function, grad::Function; alpha=0.1, xinit=Inf, max_iters=1000, atol=1e-6) where T <: Int64

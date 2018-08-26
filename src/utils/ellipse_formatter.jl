@@ -1,7 +1,6 @@
 using LinearAlgebra; 
 
-include("elementwise_pseudoinvert.jl")
-include("rotate_mat2d.jl")
+include("utils.jl")
 
 
 function quad2conic(S::AbstractArray; center=[0 0])
