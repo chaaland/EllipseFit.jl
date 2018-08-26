@@ -16,10 +16,16 @@ function levenberg_marquardt(input_output_shape::Tuple{Int64,Int64}, f::Function
     Returns :
         xvals : the trajectory of the gradient descent
         fvals : the value of the objective along the trajectory
-        gradnorm : the norm of the gradient along the trajectory
+        stop_criteria : root mean square of twice the transposed jacobian times the evaluation of the function
         lambdavals : the values of the penalty parameter for each iteration of the algo
 
+
+        gradnorm : the norm of the gradient along the trajectory
+        lambdavals : the values of the penalty parameter for each iteration of the algo
     =#
+
+    LAMBDA_MAXIMUM = 1e10;
+    STEPSZ_MINIMUM = 1e-5;
 
     n = input_output_shape[1];
     m = input_output_shape[2];
@@ -34,38 +40,42 @@ function levenberg_marquardt(input_output_shape::Tuple{Int64,Int64}, f::Function
     fvals = vcat(f(xcurr));
 
     total_deriv = J(xcurr);
-    gradnorm = rmse(2*total_deriv' * f(xcurr));
+    stop_criteria = rmse(2 * total_deriv' * f(xcurr));
 
     for i in 1:max_iters
         while true
             if m == 1
-                A = total_deriv[1]^2 + lambdavals[i];          
-                b = total_deriv[1] * fvals[i];
-                lm_step = b / A ;
-                xcurr = xvals[i] - lm_step;
+                A = vcat(total_deriv, sqrt(lambdavals[i]) * Matrix{Float64}(I, n, n));
+                b = vcat(total_deriv .* xvals[:,i] .- fvals[:,i], sqrt(lambdavals[i]) * xvals[:,i]);
+                xcurr = A \ b;
             else
-                A = total_deriv' * total_deriv + lambdavals[i] * eye(n, n); 
-                b = total_deriv' * fvals[:,i];
-                lm_step = A \ b;
-                xcurr = xvals[:,i] - lm_step;
+                A = vcat(total_deriv, sqrt(lambdavals[i]) * Matrix{Float64}(I, n, n));
+                b = vcat(total_deriv * xvals[:,i] - fvals[:,i], sqrt(lambdavals[i]) * xvals[:,i]);
+                xcurr = A \ b;
             end
-            
-            if sum(f(xcurr).^2) > sum(fvals[:,i].^2)
-                lambdavals[i] = 2 * lambdavals[i];
-            else
+
+            if norm(f(xcurr)) < norm(fvals[:,i])
                 lambdavals = hcat(lambdavals, lambdavals[i] * 0.8);
                 break
+            elseif 2 * lambdavals[i] > LAMBDA_MAXIMUM
+                lambdavals = hcat(lambdavals, lambdavals[i]);
+                break;
+            elseif rmse(xcurr - xvals[:,i]) < STEPSZ_MINIMUM
+                lambdavals = hcat(lambdavals, lambdavals[i]);
+                break;
+            else
+                lambdavals[i] = 2 * lambdavals[i];
             end
         end
 
         xvals = hcat(xvals, xcurr);
         fvals = hcat(fvals, f(xcurr));
         total_deriv = J(xcurr); 
-        gradnorm = hcat(gradnorm, rmse(2*total_deriv' * f(xcurr)));
-        if rmse(2*total_deriv' * f(xcurr)) <= atol                   # From grad ||f(x)||^2
+        stop_criteria = hcat(stop_criteria, rmse(2 * total_deriv' * f(xcurr)));
+        if stop_criteria[end] <= atol                   # From grad ||f(x)||^2
             break
         end
     end
-    
-    return xvals, fvals, gradnorm, lambdavals
+
+    return xvals, fvals, vec(stop_criteria), vec(lambdavals)
 end

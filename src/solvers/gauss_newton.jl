@@ -1,7 +1,8 @@
 include("../utils/rmse.jl")
 
 
-function gauss_newton(input_output_shape::Tuple{Int64,Int64}, f::Function, J::Function; xinit=Inf, max_iters=1000, atol=1e-6)
+function gauss_newton(input_output_shape::Tuple{Int64,Int64}, f::Function, J::Function;
+                      xinit=Inf, max_iters=1000, atol=1e-6)
     #= Use the gauss-newton method to find extrema
     
     The Gauss-Newton method is used to approximately solve the non-linear least
@@ -19,7 +20,7 @@ function gauss_newton(input_output_shape::Tuple{Int64,Int64}, f::Function, J::Fu
     Returns :
         xvals : the trajectory of the gradient descent
         fvals : the value of the objective along the trajectory
-        gradnorm : the norm of the jacobian along the trajectory
+        stop_criteria : the norm of the jacobian along the trajectory
 
     =#
 
@@ -35,27 +36,27 @@ function gauss_newton(input_output_shape::Tuple{Int64,Int64}, f::Function, J::Fu
     fvals = vcat(f(xcurr));
 
     total_deriv = J(xcurr);
-    gradnorm = rmse(2*total_deriv' * f(xcurr));
+    stop_criteria = rmse(2*total_deriv' * f(xcurr));
 
     for i=1:max_iters
         if m == 1
-            gn_step = fvals / total_deriv[0];
-            xcurr = xvals[i] - gn_step;
+            A = vcat(total_deriv);
+            b = vcat(total_deriv .* xvals[:,i] .- fvals[:,i]);
+            xcurr = A \ b;
         else
-            A = total_deriv' * total_deriv; 
-            b = total_deriv' * fvals[:,i];
-            gn_step = A \ b;
-            xcurr = xvals[:,i] - gn_step;
+            A = vcat(total_deriv);
+            b = vcat(total_deriv * xvals[:,i] - fvals[:,i]);
+            xcurr = A \ b;
         end
 
         xvals = hcat(xvals, xcurr);
         fvals = hcat(fvals, f(xcurr));
         total_deriv = J(xcurr);
-        gradnorm = hcat(gradnorm, rmse(2*total_deriv' * f(xcurr)));
+        stop_criteria = hcat(stop_criteria, rmse(2*total_deriv' * f(xcurr)));
         if rmse(2*total_deriv' * f(xcurr)) <= atol                   # From grad ||f(x)||^2
             break
         end
     end
     
-    return xvals, fvals, gradnorm
+    return xvals, fvals, vec(stop_criteria)
 end
