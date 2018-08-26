@@ -1,3 +1,4 @@
+using Statistics;
 
 function rmse(x::AbstractArray; y=0)
     #= Computes the root mean square error between x and y 
@@ -6,7 +7,7 @@ function rmse(x::AbstractArray; y=0)
         sqrt(1/N * (sum((x_i - y_i)^2)))
     =#
 
-    squared_diff = (x - y).^2;
+    squared_diff = (x .- y).^2;
     mean_square_error = mean(squared_diff);
 
     return sqrt(mean_square_error)

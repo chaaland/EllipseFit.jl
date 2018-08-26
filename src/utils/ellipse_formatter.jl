@@ -1,3 +1,5 @@
+using LinearAlgebra; 
+
 include("elementwise_pseudoinvert.jl")
 include("rotate_mat2d.jl")
 
@@ -77,7 +79,7 @@ function conic2quad(A, B, C, D, E, F)
     Q = [A B/2; B/2 C];
     b = [D; E];
 
-    beta = pinv(Q) * b;
+    beta = Q \ b;
     c = 0.25 * b' * beta - F;
 
     S = Q / c;
@@ -114,8 +116,8 @@ function parametric2quad(semiaxis_lengths; center=[0 0], ccw_angle=0)
         error("Parameter 'center' must be of size 2");
     end
 
-    sqrtD = diagm(vec(semiaxis_lengths));
-    invD = elementwise_pseudoinvert(sqrtD.^2);
+    sqrtD = diagm(0 => vec(semiaxis_lengths));
+    invD = elementwise_pseudoinvert(sqrtD .^ 2);
     V = rotate_mat2d(ccw_angle);
     S = V * invD * V';
 
@@ -146,9 +148,9 @@ function quad2parametric(S; center=[0 0])
                     the positive x-axis
     =#
 
-    f = eigfact(S);
-    V = f[:vectors];
-    D = f[:values];
+    f = eigen(S);
+    V = f.vectors;
+    D = f.values;
 
     semiaxis_lengths = sqrt(elementwise_pseudoinvert(D));
     ccw_angle = acos(V[0,0]);

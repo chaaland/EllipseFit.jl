@@ -14,18 +14,18 @@ function least_squares_fit(X::Array{T,2}) where T <: Real
         The coefficients of the ellipse in conic section form
     =#
 
-    m, n = size(X);
+    N, n = size(X);
 
-    if m == 2  
-        X = 1.0 * X';
+    if n != 2  
+        error("Expected an array with second dimension 2")
     end
 
     x = vec(X[:,1]);
     y = vec(X[:,2]);
-    one = ones(m,1);
-    b = zeros(m, 1);
+    one = ones(N,1);
+    b = zeros(N, 1);
 
-    A = hcat(x.^2, x .* y, y.^2, x, y);
+    A = hcat(x .^ 2, x .* y, y .^ 2, x, y);
     coeffs = A \ one;
     
     A = coeffs[1];

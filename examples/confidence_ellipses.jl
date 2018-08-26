@@ -1,8 +1,9 @@
-include("../src/utils/quadform2ellipse_coords.jl");
+# include("../src/utils/quadform2ellipse_coords.jl");
 include("../src/utils/rotate_mat2d.jl");
 
 using PyPlot
 using Distributions
+using EllipsePlot
 
 #= 
 Small script demonstrating how to use the module to plot ellipses. 
@@ -13,15 +14,20 @@ freedom.
 
 pvals = [0.85, 0.9, 0.95, 0.99];
 
+# Generate positive semidefinite covariance matrix
 V = rotate_mat2d(pi/3);
-D = diagm(vec([3/4 1/4]));
+D = diagm(0 => vec([3/4 1/4]));
 covariance = V * D * V';
 precision = inv(covariance);
-print(precision ≈ precision')
+
+
+# Specify mean and degrees of freedom for distribution
 mu = [-1 0.5];
 dof = 2;
 
 figure(figsize=(10,10))
+
+# Plot confidence ellipses for different false positive rates
 for p = pvals
     alpha = cquantile(Chisq(dof), 1-p);         # Probability in right tail
     S = precision / alpha;
@@ -29,13 +35,13 @@ for p = pvals
     plot(X[1,:], X[2,:], label="p = $p");
 end
 
-scatter(c[1], c[2]);
+scatter(mu[1], mu[2]);
 
+legend();
 title(L"$(x-\mu)^T \Sigma^{-1}(x-\mu) = F_{\chi^2_2}(p)$ confidence ellipsoids");
 xlabel(L"$x$");
 ylabel(L"$y$");
 
-legend();
 xlim(-3,3);
 ylim(-3,3);
 grid(true);

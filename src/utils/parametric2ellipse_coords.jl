@@ -1,7 +1,7 @@
 include("rotate_mat2d.jl");
 
 
-function parametric2ellipse_coords(semiaxis_lengths::AbstractArray; center=[0 0], ccw_angle=0, numpoints=1000)
+function parametric2ellipse_coords(semiaxis_lengths::Vector{T}; center=[0 0], ccw_angle=0, numpoints=1000) where T <: Real
     #= Helper for plotting a (possibly degenerate) 2D ellipse given semi-major/minor
     axes lengths, ellipse center coordinates and angle off the positive x axis
     
@@ -31,10 +31,10 @@ function parametric2ellipse_coords(semiaxis_lengths::AbstractArray; center=[0 0]
     if size(vec(semiaxis_lengths))[1] != 2
         error("Parameter 'semiaxis_lengths' must be of size 2");
     end
+
     center = vec(center);
-    semiaxis_lengths = vec(semiaxis_lengths);
     
-    theta = vec(linspace(0, 2*pi, numpoints));
+    theta = vec(range(0, stop=2*pi, length=numpoints));
     onaxis_ellipse = semiaxis_lengths .* [cos.(theta) sin.(theta)]';
     
     return center .+ rotate_mat2d(ccw_angle) * onaxis_ellipse;

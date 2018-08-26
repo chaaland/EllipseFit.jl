@@ -1,7 +1,9 @@
+using LinearAlgebra;
+
 include("elementwise_pseudoinvert.jl");
 
 
-function quadform2ellipse_coords(psdMatrix::AbstractArray; center=[0; 0], numpoints=1000)
+function quadform2ellipse_coords(S::AbstractArray; center=[0; 0], numpoints=1000)
     #= Helper for plotting a (possibly degenerate) 2D ellipse given its quadratic form
     
     Given the positve semidefinite matrix of a quadratic form specifying an ellipse
@@ -10,8 +12,8 @@ function quadform2ellipse_coords(psdMatrix::AbstractArray; center=[0; 0], numpoi
     are returned
     
     Args :
-        psdMatrix : An array representing the quadratic form of an ellipse 
-                    having the form 'x^T * psdMatrix * x = 1'
+        S : An array representing the quadratic form of an ellipse 
+                    having the form 'x^T * S * x = 1'
         center : The origin of the ellipse to be plotte. This is a 2x1 vector
         numpoints : The number of points to plot. Controls the granularity of the 
                     plotted figure
@@ -22,33 +24,31 @@ function quadform2ellipse_coords(psdMatrix::AbstractArray; center=[0; 0], numpoi
     =#
     
 
-    if !(psdMatrix ≈ psdMatrix')
-        error("Parameter 'psdMatrix' must be symmetric");
-    elseif size(psdMatrix) != (2,2)
-        error("Parameter 'psdMatrix' must be (2,2)")
+    if size(S) != (2,2)
+        error("Parameter 'S' must be (2,2)")
     elseif size(vec(center))[1] != 2
-        error("Parameter 'center' must be of size 2")
-    end
-    
-    center = vec(center);
-    if psdMatrix == zeros(2,2)
-        return center * ones(1, numpoints)
+        error("Input matrix must be positive semidefinite");
+    elseif S == zeros(2,2)
+        error("Input matrix must be nonzero")
     end
 
-    f = eigfact(psdMatrix);
-    V = f[:vectors];
-    D = f[:values];
+    S = (S + S') / 2;
+    center = vec(center);
+
+    f = eigen(S);
+    V = f.vectors;
+    D = f.values;
     
-    D[D .== -0.0] = 0.0;
+    # D[D .== -0.0] = 0.0;
     negative_eigs = sum(D .< 0);
     if (negative_eigs > 0)
         error("Input matrix must be positive semidefinite");
     end
     
-    theta = vec(linspace(0, 2*pi, numpoints));
+    theta = vec(range(0, stop=2*pi, length=numpoints));
     y = [cos.(theta) sin.(theta)]';         # trace out the unit circle
     invD = elementwise_pseudoinvert(D);
-    X = V * (sqrt.(invD) .* y);             # stretch/rotate the circle into an ellipse using Sigma^{-1/2}
+    X = V * (sqrt.(invD) .* y);             # stretch/rotate the circle into an ellipse using D^{-1/2}
     
-    return center .+ X
+    return center' .+ X'
 end

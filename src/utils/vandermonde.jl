@@ -1,8 +1,10 @@
 
-function vandermonde(x::Array{T,1}, n) where T <: Real
+function vandermonde(x::Vector{T}, degree) where T <: Real
     #= Generates a vandermonde matrix using the entries of x
+
     Given a vector x, the successive powers of x up to and including n
     are computed and stored as rows of a matrix
+
     Args :
         x : a vector of values
         n : the degree of the polynomial
@@ -11,12 +13,13 @@ function vandermonde(x::Array{T,1}, n) where T <: Real
             [1 a a^2 ... a^{n-1} a^n]
     =#
 
-    A = zeros(length(x), n + 1);
-    xtilde = vec(x);
-    col = ones(size(xtilde));
-    for i = 0:n
-        A[:,i+1] = col;
-        col = col .* xtilde;
+    N = length(x);
+    A = zeros(N, degree + 1);
+    col = ones(N);
+
+    for i = 0:degree
+        A[:, i+1] = col;
+        col = col .* x;
     end
 
     return A

@@ -6,8 +6,8 @@ function elementwise_pseudoinvert(v::AbstractArray, tol=1e-10)
     Elements within tol of 0 are treated as zero
     
     Args :
-        v : array
-        tol : 
+        v : an array to take the reciprocal of
+        tol : tolerance for setting an element to zero
     
     Returns :
         Array with the elements inverted except the zeros
@@ -15,8 +15,8 @@ function elementwise_pseudoinvert(v::AbstractArray, tol=1e-10)
 
     m = maximum(abs.(v));
     v = v ./ m;
-    reciprocal = 1./v;
-    reciprocal[abs.(reciprocal) .>= 1/tol] = 0;   
+    reciprocal = 1 ./ v;
+    reciprocal[abs.(reciprocal) .>= 1/tol] .= 0;   
 
     return reciprocal / m;
 end

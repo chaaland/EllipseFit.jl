@@ -8,17 +8,20 @@ function orthogonal_dist_fit(X::Array{T,2}) where T <: Real
     error in both the independent and dependent variables
 
     Args :
-        X : 2 x N or N x 2 matrix containing the data to be fit with an ellipse
+        X : An N x 2 matrix containing the data to be fit with an ellipse
 
     Returns :
+        center :
+        semiaxis_lengths :
+        ccw_angle :
 
     =#
-    m, n = size(X);
 
-    if m == 2  
-        X = 1.0 * X';
+    N, n = size(X);
+    if n != 2:
+        error("Expected array with second dimension 2")
     end
-    N = size(X, 1);
+
     num_params = 5 + N;             # xcenter, ycenter, angle, semi major, semi minor + theta per data point
     num_equalities = 2 * N;
     thetavals_lm, fvals_lm, gradnorm_lm, lambdavals_lm = levenberg_marquardt((num_params, num_equalities), parametric_ellipse, 
