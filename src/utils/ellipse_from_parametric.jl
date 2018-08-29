@@ -1,7 +1,7 @@
 include("utils.jl");
 
 
-function parametric2ellipse_coords(semiaxis_lengths::Vector{T}; center=[0 0], ccw_angle=0, numpoints=1000) where T <: Real
+function ellipse_from_parametric(semiaxis_lengths::Vector{T}; center=[0 0], ccw_angle=0, numpoints=1000) where T <: Real
     #= Helper for plotting a (possibly degenerate) 2D ellipse given semi-major/minor
     axes lengths, ellipse center coordinates and angle off the positive x axis
     

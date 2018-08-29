@@ -1,7 +1,7 @@
 include("../utils/utils.jl")
 
 
-function gauss_newton(input_output_shape::Tuple{Int64,Int64}, f::Function, J::Function;
+function gaussnewton(input_output_shape::Tuple{Int64,Int64}, f::Function, J::Function;
                       xinit=Inf, max_iters=1000, atol=1e-6)
     #= Use the gauss-newton method to find extrema
     

@@ -87,7 +87,7 @@ function elementwise_pseudoinvert(v::AbstractArray, tol=1e-10)
     return reciprocal / m;
 end
 
-function random_ellipse(numpoints=50)
+function randomellipse(numpoints=50)
     #= Example function for plotting data roughly corresponding to an ellipse plus noise
 
     Helper function used to generate noisy ellipse data with sample points drawn from 

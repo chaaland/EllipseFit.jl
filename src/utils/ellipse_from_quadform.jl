@@ -3,7 +3,7 @@ using LinearAlgebra;
 include("utils.jl");
 
 
-function quadform2ellipse_coords(S::AbstractArray; center=[0; 0], numpoints=1000)
+function ellipse_from_quadform(S::AbstractArray; center=[0; 0], numpoints=1000)
     #= Helper for plotting a (possibly degenerate) 2D ellipse given its quadratic form
     
     Given the positve semidefinite matrix of a quadratic form specifying an ellipse
@@ -19,7 +19,7 @@ function quadform2ellipse_coords(S::AbstractArray; center=[0; 0], numpoints=1000
                     plotted figure
     
     Returns :
-        A 2 x numpoints matrix where the x and y coordinates are in the 1st and 2nd row 
+        A numpoints x 2 matrix where the x and y coordinates are in the 1st and 2nd row 
         respectively
     =#
     

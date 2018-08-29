@@ -1,5 +1,5 @@
 
-function orthogonal_dist_fit(X::Array{T,2}) where T <: Real
+function orthogonal_distance_fit(X::Array{T,2}) where T <: Real
     #= Fit an ellipse by minimizing the orthogonal distance of the points 
 
     Rather than least squares, the ellipse is fit so as to minimize the 
@@ -11,21 +11,22 @@ function orthogonal_dist_fit(X::Array{T,2}) where T <: Real
         X : An N x 2 matrix containing the data to be fit with an ellipse
 
     Returns :
-        center :
-        semiaxis_lengths :
-        ccw_angle :
+        center : a 2 vector containing x and y coords of ellipse center
+        semiaxis_lengths : a 2 vector containing the semi axis lengths of the ellipse
+        ccw_angle : scalar indicating the angle made wrt positive x axis
 
     =#
 
     N, n = size(X);
-    if n != 2:
+    if n != 2
         error("Expected array with second dimension 2")
     end
 
     num_params = 5 + N;             # xcenter, ycenter, angle, semi major, semi minor + theta per data point
     num_equalities = 2 * N;
-    thetavals_lm, fvals_lm, gradnorm_lm, lambdavals_lm = levenberg_marquardt((num_params, num_equalities), parametric_ellipse, 
-                                                                    jacobian_ellipse; xinit=xinit, max_iters=100, atol=1e-6);
+    thetavals_lm, fvals_lm, gradnorm_lm, lambdavals_lm = 
+                                    levenbergmarquardt((num_params, num_equalities), z -> parametric_ellipse(z,X), 
+                                                        jacobian_ellipse; xinit=Inf, max_iters=100, atol=1e-6);
 
     center = vec(thetavals_lm[1:2,end]);
     semiaxis_lengths = vec(thetavals_lm[3:4,end]);
@@ -34,7 +35,7 @@ function orthogonal_dist_fit(X::Array{T,2}) where T <: Real
     return center, semiaxis_lengths, ccw_angle
 end
 
-function parametric_ellipse(x::Array{T,1}) where T <: Real
+function parametric_ellipse(x::Vector{T}, data) where T <: Real
     center = x[1:2];
     semiaxis_lengths = x[3:4];
     ccw_angle = x[5];
@@ -44,10 +45,10 @@ function parametric_ellipse(x::Array{T,1}) where T <: Real
     rotated_ellipse = rotate_mat2d(ccw_angle) * onaxis_ellipse;
     shifted_ellipse = center .+ rotated_ellipse;
 
-    return vec(shifted_ellipse) - vec(X')
+    return vec(shifted_ellipse) - vec(data')
 end
 
-function jacobian_ellipse(x::Array{T,1}) where T <: Real
+function jacobian_ellipse(x::Vector{T}) where T <: Real
     center = vec(x[1:2]);
     semiaxis_lengths = vec(x[3:4]);
     ccw_angle = x[5];

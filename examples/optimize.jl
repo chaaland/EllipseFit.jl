@@ -1,9 +1,7 @@
-include("../src/utils/vandermonde.jl")
-include("../src/solvers/grad_desc.jl")
-include("../src/solvers/newton_raphson.jl")
 
 using PyPlot
 using Random
+using EllipseFit
 
 Random.seed!(1)
 
@@ -29,8 +27,8 @@ function hessian(x)
     return 2 * A' * A;
 end
 
-traj_gd, cost_gd, gradmagnitude_gd = grad_desc(2, f, grad, max_iters=100, alpha=0.01);
-traj_nr, cost_nr, gradmagnitude_nr = newton_raphson(2, f, jacobian, hessian, max_iters=10);
+traj_gd, cost_gd, gradmagnitude_gd = graddesc(2, f, grad, max_iters=100, alpha=0.01);
+traj_nr, cost_nr, gradmagnitude_nr = newtonraphson(2, f, jacobian, hessian, max_iters=10);
 
 figure(figsize=(10,10));
 x = vec(linspace(-5,3,100));
