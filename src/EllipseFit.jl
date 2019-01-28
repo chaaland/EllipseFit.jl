@@ -8,7 +8,7 @@ module EllipsePlot
     ####################################
     # Utils
     ####################################
-include("utils/elementwise_pseudoinvert.jl")
+# include("utils/elementwise_pseudoinvert.jl")
     include("utils/utils.jl");    # include the contents of other files in the module
     include("utils/parametric2ellipse_coords.jl");            
     include("utils/quadform2ellipse_coords.jl");
