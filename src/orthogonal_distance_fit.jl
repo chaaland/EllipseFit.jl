@@ -18,7 +18,7 @@ function orthogonal_dist_fit(X::Array{T,2}) where T <: Real
     =#
 
     N, n = size(X);
-    if n != 2:
+    if n != 2
         error("Expected array with second dimension 2")
     end
 
