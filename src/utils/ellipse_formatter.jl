@@ -1,8 +1,5 @@
 using LinearAlgebra; 
 
-include("utils.jl")
-
-
 function quad2conic(S::AbstractArray; center=[0 0])
     #= Helper for converting quadratic form ellipse into a standard conic form
     

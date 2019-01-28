@@ -1,4 +1,4 @@
-module EllipsePlot
+module EllipseFit
     export quadform2ellipse_coords, parametric2ellipse_coords, rotate_mat2d, 
            vandermonde, least_squares_fit, orthogonal_distance_fit, gauss_newton, levenberg_marquardt, conic2parametric
 

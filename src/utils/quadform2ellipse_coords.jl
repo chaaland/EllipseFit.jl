@@ -1,8 +1,5 @@
 using LinearAlgebra;
 
-include("utils.jl");
-
-
 function quadform2ellipse_coords(S::AbstractArray; center=[0; 0], numpoints=1000)
     #= Helper for plotting a (possibly degenerate) 2D ellipse given its quadratic form
     
