@@ -123,7 +123,7 @@ function parametric2quad(semiaxis_lengths; center=[0 0], ccw_angle=0)
     return S, vec(center)
 end
 
-function quad2parametric(S; center=[0 0])
+function quad2parametric(S, center=[0 0])
     #= Helper for converting from quadratic form to parameteric form of ellipse
 
     Given an ellipse as a quadratic form 
@@ -151,8 +151,8 @@ function quad2parametric(S; center=[0 0])
     V = f.vectors;
     D = f.values;
 
-    semiaxis_lengths = sqrt(elementwise_pseudoinvert(D));
-    ccw_angle = acos(V[0,0]);
+    semiaxis_lengths = sqrt.(elementwise_pseudoinvert(D));
+    ccw_angle = acos(V[1,1]);
 
     return vec(semiaxis_lengths), vec(center), ccw_angle
 end
