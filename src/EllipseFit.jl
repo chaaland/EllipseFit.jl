@@ -1,24 +1,24 @@
-module EllipsePlot
-    export quadform2ellipse_coords, parametric2ellipse_coords, rotate_mat2d, 
-           vandermonde, least_squares_fit, orthogonal_distance_fit, gauss_newton, levenberg_marquardt
+module EllipseFit
 
-    include("least_squares_fit.jl")
-    include("orthogonal_distance_fit.jl")
+export quadform2ellipse_coords, parametric2ellipse_coords, rotate_mat2d, 
+        vandermonde, least_squares_fit, orthogonal_distance_fit, gauss_newton, levenberg_marquardt
 
-    ####################################
-    # Utils
-    ####################################
-    include("utils/utils.jl");    # include the contents of other files in the module
-    include("utils/parametric2ellipse_coords.jl");            
-    include("utils/quadform2ellipse_coords.jl");
+include("least_squares_fit.jl")
+include("orthogonal_distance_fit.jl")
 
-    ####################################
-    # Solvers
-    #################################### 
-    include("solvers/gauss_newton.jl");
-    include("solvers/levenberg_marquardt.jl");
-    include("solvers/newton_raphson.jl");
-    include("solvers/grad_desc.jl");
+####################################
+# Utils
+####################################
+include("utils/utils.jl");    # include the contents of other files in the module
+include("utils/parametric2ellipse_coords.jl");            
+include("utils/quadform2ellipse_coords.jl");
 
+####################################
+# Solvers
+#################################### 
+include("solvers/gauss_newton.jl");
+include("solvers/levenberg_marquardt.jl");
+include("solvers/newton_raphson.jl");
+include("solvers/grad_desc.jl");
 
 end
