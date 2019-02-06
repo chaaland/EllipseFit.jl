@@ -152,7 +152,7 @@ function quad2parametric(S; center=[0 0])
     D = f.values;
 
     semiaxis_lengths = sqrt(elementwise_pseudoinvert(D));
-    ccw_angle = acos(V[0,0]);
+    ccw_angle = atan(V[2,1], V[1,1]);
 
     return vec(semiaxis_lengths), vec(center), ccw_angle
 end
