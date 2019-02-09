@@ -18,8 +18,6 @@ function levenberg_marquardt(input_output_shape::Tuple{Int64,Int64}, f::Function
         fvals : the value of the objective along the trajectory
         stop_criteria : root mean square of twice the transposed jacobian times the evaluation of the function
         lambdavals : the values of the penalty parameter for each iteration of the algo
-
-
         gradnorm : the norm of the gradient along the trajectory
         lambdavals : the values of the penalty parameter for each iteration of the algo
     =#
@@ -47,13 +45,12 @@ function levenberg_marquardt(input_output_shape::Tuple{Int64,Int64}, f::Function
             if m == 1
                 A = vcat(total_deriv, sqrt(lambdavals[i]) * Matrix{Float64}(I, n, n));
                 b = vcat(total_deriv .* xvals[:,i] .- fvals[:,i], sqrt(lambdavals[i]) * xvals[:,i]);
-                xcurr = A \ b;
             else
                 A = vcat(total_deriv, sqrt(lambdavals[i]) * Matrix{Float64}(I, n, n));
                 b = vcat(total_deriv * xvals[:,i] - fvals[:,i], sqrt(lambdavals[i]) * xvals[:,i]);
-                xcurr = A \ b;
             end
 
+            xcurr = A \ b;
             if norm(f(xcurr)) < norm(fvals[:,i])
                 lambdavals = hcat(lambdavals, lambdavals[i] * 0.8);
                 break
