@@ -42,13 +42,12 @@ function gaussnewton(input_output_shape::Tuple{Int64,Int64}, f::Function, J::Fun
         if m == 1
             A = vcat(total_deriv);
             b = vcat(total_deriv .* xvals[:,i] .- fvals[:,i]);
-            xcurr = A \ b;
         else
             A = vcat(total_deriv);
             b = vcat(total_deriv * xvals[:,i] - fvals[:,i]);
-            xcurr = A \ b;
         end
 
+        xcurr = A \ b;
         xvals = hcat(xvals, xcurr);
         fvals = hcat(fvals, f(xcurr));
         total_deriv = J(xcurr);
