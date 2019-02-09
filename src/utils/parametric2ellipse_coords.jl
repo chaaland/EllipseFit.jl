@@ -36,7 +36,7 @@ function parametric2ellipse_coords(semiaxis_lengths::Vector{T}; center=[0 0], cc
     theta = range(0, stop=2*pi, length=numpoints);
     unit_circle_points = [cos.(theta)'; sin.(theta)'];
     onaxis_ellipse_points = semiaxis_lengths .*  unit_circle_points;
-    rotated_ellipse_points = rotate_mat2d(ccw_angle) * onaxis_ellipse_points;
+    rotated_ellipse_points = rotation_mat(ccw_angle) * onaxis_ellipse_points;
 
     return center .+ rotated_ellipse_points 
 end
