@@ -7,14 +7,14 @@ include("ellipse.jl")
 ####################################
 # Utils
 ####################################
-include("utils.jl");    # include the contents of other files in the module
+include("utils.jl")    # include the contents of other files in the module
 
 ####################################
 # Solvers
 #################################### 
-include("solvers/gauss_newton.jl");
-include("solvers/levenberg_marquardt.jl");
-include("solvers/newton_raphson.jl");
-include("solvers/grad_desc.jl");
+include("solvers/gaussnewton.jl")
+include("solvers/levenbergmarquardt.jl")
+include("solvers/newtonraphson.jl")
+include("solvers/graddesc.jl")
 
 end

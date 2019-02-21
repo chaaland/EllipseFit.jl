@@ -3,15 +3,15 @@ using LinearAlgebra
 include("utils.jl")
 include("ellipse.jl")
 include("solvers.jl")
-include("solvers/levenberg_marquardt.jl")
-include("solvers/gauss_newton.jl")
+include("solvers/levenbergmarquardt.jl")
+include("solvers/gaussnewton.jl")
 
 function fit!(model::EllipseModel)
     if model.objective == Objective.LeastSquares
-       A, B, C, D, E = leastsquares(model.X, model.solver)
+       A, B, C, D, E, F = leastsquares(model.X, model.solver)
        model.solution = Ellipse(A, B, C, D, E)
     # elseif model.objective == Objective.OrthogonalDistance
-    #     center, semiaxis_lengths, ccw_angle = orthogonaldist(model.X, model.solver)
+    #     semiaxis_lengths, center, ccw_angle = orthogonaldist(model.X, model.solver)
     #     model.solution = Ellipse(center, semiaxis_lengths, ccw_angle)
     else
         error("Unsupported solver type")
@@ -33,27 +33,27 @@ function leastsquares(X::Array{T,2}, solver::Solver=NormalEquations) where T <: 
         The coefficients of the ellipse in conic section form
     =#
 
-    N, n = size(X);
+    N, n = size(X)
 
     if n != 2  
         error("Expected an array with second dimension 2")
     end
 
-    x = vec(X[:,1]);
-    y = vec(X[:,2]);
+    x = vec(X[:,1])
+    y = vec(X[:,2])
 
-    A = hcat(x .^ 2, x .* y, y .^ 2, x, y);
-    b = ones(N);
+    A = hcat(x .^ 2, x .* y, y .^ 2, x, y)
+    b = ones(N)
 
     if solver == NormalEquations
-        coeffs = A \ b;
+        coeffs = A \ b
         
-        A = coeffs[1];
-        B = coeffs[2];
-        C = coeffs[3];
-        D = coeffs[4];
-        E = coeffs[5];
-
+        A = coeffs[1]
+        B = coeffs[2]
+        C = coeffs[3]
+        D = coeffs[4]
+        E = coeffs[5]
+        
         return A, B, C, D, E
     elseif solver == Solver.GradientDescent
         error("Unsupported solver GradientDescent")
@@ -80,59 +80,59 @@ function orthogonaldist(X::Array{T,2}, solver::Solver=LevenbergMarquardt) where 
 
     =#
 
-    N, n = size(X);
+    N, n = size(X)
     if n != 2
         error("Expected array with second dimension 2")
     end
 
-    num_params = 5 + N;             # xcenter, ycenter, angle, semi major, semi minor + theta per data point
-    num_equalities = 2 * N;
+    num_params = 5 + N             # xcenter, ycenter, angle, semi major, semi minor + theta per data point
+    num_equalities = 2 * N
     thetavals_lm, fvals_lm, gradnorm_lm, lambdavals_lm = 
                                     levenbergmarquardt((num_params, num_equalities), z -> parametric_ellipse(z,X), 
-                                                        jacobian_ellipse; xinit=Inf, max_iters=100, atol=1e-6);
+                                                        jacobian_ellipse; xinit=Inf, max_iters=100, atol=1e-6)
 
-    center = vec(thetavals_lm[1:2,end]);
-    semiaxis_lengths = vec(thetavals_lm[3:4,end]);
-    ccw_angle = thetavals_lm[5, end];
+    center = vec(thetavals_lm[1:2,end])
+    semiaxis_lengths = vec(thetavals_lm[3:4,end])
+    ccw_angle = thetavals_lm[5, end]
 
     return center, semiaxis_lengths, ccw_angle
 end
 
 function parametric_ellipse(x::Vector{T}, data) where T <: Real
-    center = x[1:2];
-    semiaxis_lengths = x[3:4];
-    ccw_angle = x[5];
-    theta = x[6:end];
+    center = x[1:2]
+    semiaxis_lengths = x[3:4]
+    ccw_angle = x[5]
+    theta = x[6:end]
     
-    onaxis_ellipse = diagm(0 => vec(semiaxis_lengths)) * [cos.(theta)'; sin.(theta)'];
-    rotated_ellipse = rotation_mat(ccw_angle) * onaxis_ellipse;
-    shifted_ellipse = center .+ rotated_ellipse;
+    onaxis_ellipse = diagm(0 => vec(semiaxis_lengths)) * [cos.(theta)'; sin.(theta)']
+    rotated_ellipse = rotation_mat(ccw_angle) * onaxis_ellipse
+    shifted_ellipse = center .+ rotated_ellipse
 
     return vec(shifted_ellipse) - vec(x')
 end
 
 function jacobian_ellipse(x::Vector{T}) where T <: Real
-    center = vec(x[1:2]);
-    semiaxis_lengths = vec(x[3:4]);
-    ccw_angle = x[5];
-    theta = vec(x[6:end]);
+    center = vec(x[1:2])
+    semiaxis_lengths = vec(x[3:4])
+    ccw_angle = x[5]
+    theta = vec(x[6:end])
     
-    a = semiaxis_lengths[1];
-    b = semiaxis_lengths[2];
+    a = semiaxis_lengths[1]
+    b = semiaxis_lengths[2]
     
-    dxc = repeat([1, 0], length(theta), 1);
-    dyc = repeat([0, 1], length(theta), 1);
-    da = vec([cos.(ccw_angle)*cos.(theta) sin.(ccw_angle)*cos.(theta)]');
-    db = vec([-sin.(ccw_angle)*sin.(theta) cos.(ccw_angle)*sin.(theta)]');
-    dalpha = vec([-a*sin.(ccw_angle)*cos.(theta)-b*cos.(ccw_angle)*sin.(theta) a*cos.(ccw_angle)*cos.(theta)-b*sin.(ccw_angle)*sin.(theta)]');
-    dtheta = zeros(2*length(theta), length(theta));
+    dxc = repeat([1, 0], length(theta), 1)
+    dyc = repeat([0, 1], length(theta), 1)
+    da = vec([cos.(ccw_angle)*cos.(theta) sin.(ccw_angle)*cos.(theta)]')
+    db = vec([-sin.(ccw_angle)*sin.(theta) cos.(ccw_angle)*sin.(theta)]')
+    dalpha = vec([-a*sin.(ccw_angle)*cos.(theta)-b*cos.(ccw_angle)*sin.(theta) a*cos.(ccw_angle)*cos.(theta)-b*sin.(ccw_angle)*sin.(theta)]')
+    dtheta = zeros(2*length(theta), length(theta))
     
     for i = 1:length(theta) 
-        theta_val = theta[i];
-        val1 = -a * cos.(ccw_angle) * sin.(theta_val) - b * sin.(ccw_angle) * cos.(theta_val);
-        val2 = -a * sin.(ccw_angle) * sin.(theta_val) + b * cos.(ccw_angle) * cos.(theta_val);
-        dtheta[2*i-1:2*i, i] = [val1 val2];
+        theta_val = theta[i]
+        val1 = -a * cos.(ccw_angle) * sin.(theta_val) - b * sin.(ccw_angle) * cos.(theta_val)
+        val2 = -a * sin.(ccw_angle) * sin.(theta_val) + b * cos.(ccw_angle) * cos.(theta_val)
+        dtheta[2*i-1:2*i, i] = [val1 val2]
     end
 
-    J = [dxc dyc da db dalpha dtheta];
+    J = [dxc dyc da db dalpha dtheta]
 end

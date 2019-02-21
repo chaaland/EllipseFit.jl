@@ -1,4 +1,4 @@
-include("../utils/utils.jl")
+include("../utils.jl")
 
 
 function newtonraphson(input_dim::T, f::Function, J::Function, H::Function; 
