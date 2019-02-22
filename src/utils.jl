@@ -3,15 +3,30 @@ using Statistics;
 
 export rmse, rotation_mat, vandermonde, elementwise_pseudoinvert
 
-function rmse(x::AbstractArray; y=0)
-    #= Computes the root mean square error between x and y 
+function rmse(x::AbstractArray, y::AbstractArray)
+  #= Computes the root mean square error between x and y 
 
     Given two vectors x and y, return 
         sqrt(1/N * (sum((x_i - y_i)^2)))
     =#
 
-    squared_diff = (x .- y).^2;
-    mean_square_error = mean(squared_diff);
+    x = vec(x)
+    y = vec(y)
+    squared_diff = (x - y).^2
+    mean_square_error = mean(squared_diff)
+
+    return sqrt(mean_square_error)
+end
+
+function rmse(x::AbstractArray)
+    #= Computes the root mean square error of x and y 
+
+    Given two vectors x and y, return 
+        sqrt(1/N * (sum((x_i - y_i)^2)))
+    =#
+    x = vec(x)
+    squared_x = x.^2
+    mean_square_error = mean(squared_x)
 
     return sqrt(mean_square_error)
 end
@@ -41,7 +56,7 @@ function rotation_mat(angle::Real; ccw=true)
     return rotate_mat;
 end
 
-function vandermonde(x::Vector{T}, degree) where T <: Real
+function vandermonde(x::Vector{T}, degree::Int) where T <: Real
     #= Generates a vandermonde matrix using the entries of x
 
     Given a vector x, the successive powers of x up to and including n
@@ -55,9 +70,12 @@ function vandermonde(x::Vector{T}, degree) where T <: Real
             [1 a a^2 ... a^{n-1} a^n]
     =#
 
-    N = length(x);
-    A = zeros(N, degree + 1);
-    col = ones(N);
+    if degree < 0
+        error("Polynomial degree is expected to be nonnegative")
+    end 
+    N = length(x)
+    A = zeros(N, degree + 1)
+    col = ones(N)
 
     for i = 0:degree
         A[:, i+1] = col;
