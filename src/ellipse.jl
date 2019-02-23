@@ -1,9 +1,7 @@
 using LinearAlgebra
-include("solvers.jl")
 include("utils.jl")
 
-# export Ellipse, QuadraticFormEllipse, ConicFormEllipse, ParametricFormEllipse
-# export EllipseModel
+export Ellipse, QuadraticFormEllipse, ConicFormEllipse, ParametricFormEllipse
 
 struct QuadraticFormEllipse{T<:Real, U<:Real}
     S::Array{T,2}
@@ -46,8 +44,8 @@ struct ParametricFormEllipse{T<:Real, U<:Real, V<:Real}
     ccw_angle::V
 
     function ParametricFormEllipse(semiaxis_lengths::Array{T}, center::Array{U}, ccw_angle::V) where {T<:Real, U<:Real, V<:Real}
-        center = vec(center)
         semiaxis_lengths = vec(semiaxis_lengths)
+        center = vec(center)
 
         if size(center)[1] != 2
             error("Parameter 'center' must be vector of length 2")
@@ -117,11 +115,11 @@ function quad2parametric(qform::QuadraticFormEllipse)
      V = f.vectors;
      D = f.values;
  
-     semiaxis_lengths = sqrt(elementwise_pseudoinvert(D));
+     semiaxis_lengths = sqrt.(elementwise_pseudoinvert(D));
      major_axis = V[:,1]
      ccw_angle = atan(major_axis[2], major_axis[1]);
  
-     return ParametricFormEllipse(qform.center, semiaxis_lengths, ccw_angle)
+     return ParametricFormEllipse(semiaxis_lengths,qform.center, ccw_angle)
 end
 
 function conic2quad(cform::ConicFormEllipse)
@@ -238,9 +236,9 @@ function parametric2conic(pform::ParametricFormEllipse)
 end 
 
 struct Ellipse
-    quadratic::QuadraticFormEllipse
-    conic::ConicFormEllipse
-    parametric::ParametricFormEllipse
+    quadform::QuadraticFormEllipse
+    conicform::ConicFormEllipse
+    parametricform::ParametricFormEllipse
 end
 
 function Ellipse(S::Array{T,2}, center::Array{U}) where {T<:Real, U<:Real}
@@ -256,27 +254,10 @@ function Ellipse(A::T, B::T, C::T, D::T, E::T) where T<: Real
     parametricform = conic2parametric(conicform)
     return Ellipse(quadform, conicform, parametricform)
 end
-Ellipse(A::Real, B::Real, C::Real, D::Real, E::Real) = Ellipse(promote(A, B, C, D, E))
 
 function Ellipse(semiaxis_lengths::Array{T}, center=[0 0], ccw_angle=0) where T<:Real
     parametricform = ParametricFormEllipse(semiaxis_lengths, center, ccw_angle)
     quadform = parametric2quad(parametricform)
     conicform = parametric2conic(parametricform)
     return Ellipse(quadform, conicform, parametricform)
-end
-
-mutable struct EllipseModel
-    X::Array{Real,2}
-    objective::Objective
-    solver::Solver 
-    solution::Union{Ellipse,Nothing}
-
-    function EllipseModel(X::Array{T,2}, objective::Objective, solver::Solver, 
-                           solution::Union{Ellipse,Nothing}=nothing) where T <: Real
-        N, n = size(X)
-        if n != 2
-            error("Expected an array with second dimension 2")
-        end
-        new(X, objective, solver, solution)
-    end
 end

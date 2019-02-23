@@ -6,6 +6,22 @@ include("solvers.jl")
 include("solvers/levenbergmarquardt.jl")
 include("solvers/gaussnewton.jl")
 
+mutable struct EllipseModel
+    X::Array{Real,2}
+    objective::Objective
+    solver::Solver 
+    solution::Union{Ellipse,Nothing}
+
+    function EllipseModel(X::Array{T,2}, objective::Objective, solver::Solver, 
+                           solution::Union{Ellipse,Nothing}=nothing) where T <: Real
+        N, n = size(X)
+        if n != 2
+            error("Expected an array with second dimension 2")
+        end
+        new(X, objective, solver, solution)
+    end
+end
+
 function fit!(model::EllipseModel)
     if model.objective == Objective.LeastSquares
        A, B, C, D, E, F = leastsquares(model.X, model.solver)
