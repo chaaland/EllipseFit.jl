@@ -98,8 +98,11 @@ function elementwise_pseudoinvert(v::AbstractArray, tol=1e-10)
     Returns :
         Array with the elements inverted except the zeros
     =#
-
+    
     m = maximum(abs.(v));
+    if m == 0
+        return v
+    end
     v = v ./ m;
     reciprocal = 1 ./ v;
     reciprocal[abs.(reciprocal) .>= 1/tol] .= 0;   

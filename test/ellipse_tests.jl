@@ -1,9 +1,4 @@
-using EllipseFit
-using Test
-using LinearAlgebra
-
-
-@testset "root mean square test" begin
+@testset "Ellipse Creation" begin
 
     @test rmse(zeros(2)) == 0
     @test rmse(zeros(2,1)) ==0
