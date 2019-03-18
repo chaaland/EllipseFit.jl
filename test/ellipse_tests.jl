@@ -1,39 +1,300 @@
 using EllipseFit
+using LinearAlgebra
 using Test
 
 
 @testset "Ellipse Quadratic Form Creation" begin
 
-    S1 = [1 0; 0 1]
-    S2 = [3 0; 0 2]
-    c1 = vec([0 0])
-    c2 = vec([1 -1])
+    @testset "Unit circle" begin
+        S = Matrix{Int32}(I, 2, 2)
+        c = vec([0 0])
+        E = Ellipse(S, c)
 
-    E1 = Ellipse(S1, c1)
-    E2 = Ellipse(S2, c2)
-    
-    @test E1.quadform.S == S1
-    @test E1.quadform.center == c1
+        @test E.quadform.S == S
+        @test E.quadform.center == c
 
-    @test E1.conicform.A == 1
-    @test E1.conicform.B == 0
-    @test E1.conicform.C == 1
-    @test E1.conicform.D == 0
-    @test E1.conicform.E == 0
+        @test E.conicform.A == 1
+        @test E.conicform.B == 0
+        @test E.conicform.C == 1
+        @test E.conicform.D == 0
+        @test E.conicform.E == 0
 
-    @test E1.parametricform.center == c1
-    @test E1.parametricform.semiaxis_lengths == vec([1 1])
+        @test E.parametricform.center == c
+        @test E.parametricform.semiaxis_lengths == vec([1 1])
+    end
 
-    @test E2.quadform.S == S2
-    @test E2.quadform.center == c2
+    @testset "Horizontal Ellipse Origin" begin
+        a = 3
+        b = 2
+        S = diagm(0 => vec([1/a^2, 1/b^2]))
+        c = vec([0 0])
+        E = Ellipse(S, c)
 
-    @test E2.conicform.A == 3
-    @test E2.conicform.B == 0
-    @test E2.conicform.C == 1
-    # @test E2.conicform.D == 
-    # @test E2.conicform.E == 
-    # @test E2.conicform.F == 
+        @test E.quadform.S == S
+        @test E.quadform.center == c
 
-    @test E2.parametricform.center == c2
-    @test E2.parametricform.semiaxis_lengths == [3 2]
+        @test E.conicform.A == 1/a^2
+        @test E.conicform.B == 0
+        @test E.conicform.C == 1/b^2
+        @test E.conicform.D == 0
+        @test E.conicform.E == 0
+
+        @test E.parametricform.center == c
+        @test isapprox(E.parametricform.semiaxis_lengths, vec([a, b]))
+        @test isapprox(E.parametricform.ccw_angle % pi, 0)
+    end
+
+    @testset "Vertical Ellipse Origin" begin
+        a = 2
+        b = 3
+        S = diagm(0 => vec([1/a^2, 1/b^2]))
+        c = vec([0 0])
+        E = Ellipse(S, c)
+
+        @test E.quadform.S == S
+        @test E.quadform.center == c
+
+        @test E.conicform.A == 1/a^2
+        @test E.conicform.B == 0
+        @test E.conicform.C == 1/b^2
+        @test E.conicform.D == 0
+        @test E.conicform.E == 0
+
+        @test E.parametricform.center == c
+        @test isapprox(E.parametricform.semiaxis_lengths, vec([b, a]))
+        @test isapprox(E.parametricform.ccw_angle % pi, pi / 2)
+    end
+
+    @testset "Horizontal Ellipse Off Center" begin
+        a = 3
+        b = 2
+        S = diagm(0 => vec([1/a^2, 1/b^2]))
+        c = vec([1 -1])
+        E = Ellipse(S, c)
+
+        @test E.quadform.S == S
+        @test E.quadform.center == c
+
+        negF = 1 - 1/a^2 - 1/b^2
+        @test E.conicform.A == (1 / a^2) / negF
+        @test E.conicform.B == 0
+        @test E.conicform.C == (1 / b^2) / negF
+        @test E.conicform.D == (-2 * 1/a^2) / negF
+        @test E.conicform.E == (-2 * -1/b^2) / negF
+
+        @test E.parametricform.center == c
+        @test isapprox(E.parametricform.semiaxis_lengths, [a, b])
+        @test isapprox(E.parametricform.ccw_angle % pi, 0)
+    end
+
+    @testset "Vertical Ellipse Off Center" begin
+        a = 2
+        b = 3
+        S = diagm(0 => vec([1/a^2, 1/b^2]))
+        c = vec([1 -1])
+        E = Ellipse(S, c)
+
+        @test E.quadform.S == S
+        @test E.quadform.center == c
+
+        negF = 1 - 1/a^2 - 1/b^2
+        @test E.conicform.A == (1 / a^2) / negF
+        @test E.conicform.B == 0
+        @test E.conicform.C == (1 / b^2) / negF
+        @test E.conicform.D == (-2 * 1/a^2) / negF
+        @test E.conicform.E == (-2 * -1/b^2) / negF
+
+        @test E.parametricform.center == c
+        @test isapprox(E.parametricform.semiaxis_lengths, [b, a])
+        @test isapprox(E.parametricform.ccw_angle % pi, pi/2)
+    end
+
+    @testset "CCW Rotation 45 deg" begin
+        a = 3
+        b = 2
+        ccw_angle = pi / 4
+        rot_mat = rotation_mat(ccw_angle)
+        S = rot_mat * diagm(0 => [1/a^2; 1/b^2]) * rot_mat'
+        c = vec([0 0])
+
+        E = Ellipse(S, c)
+        @test E.quadform.S == S
+        @test E.quadform.center == c
+
+        @test E.conicform.A == S[1,1]
+        @test E.conicform.B == (S[2,1] + S[1,2])
+        @test E.conicform.C == S[2,2]
+        @test E.conicform.D == 0
+        @test E.conicform.E == 0
+
+        @test E.parametricform.center == c
+        @test isapprox(E.parametricform.semiaxis_lengths, vec([a b]))
+        @test isapprox((E.parametricform.ccw_angle + 2*pi)% pi, ccw_angle)
+    end
+
+    @testset "CCW Rotation -45 deg" begin
+        a = 3
+        b = 2
+        ccw_angle = -pi / 4
+        rot_mat = rotation_mat(ccw_angle)
+        S = rot_mat * diagm(0 => [1/a^2; 1/b^2]) * rot_mat'
+        c = vec([0 0])
+
+        E = Ellipse(S, c)
+        @test E.quadform.S == S
+        @test E.quadform.center == c
+
+        @test E.conicform.A == S[1,1]
+        @test E.conicform.B == (S[2,1] + S[1,2])
+        @test E.conicform.C == S[2,2]
+        @test E.conicform.D == 0
+        @test E.conicform.E == 0
+
+        @test E.parametricform.center == c
+        @test isapprox(E.parametricform.semiaxis_lengths, vec([a b]))
+        @test isapprox((E.parametricform.ccw_angle + 2*pi) % pi, (ccw_angle + 2*pi) % pi)
+    end
+end
+
+@testset "Ellipse Parametric Form Creation" begin
+    @testset "Unit Circle" begin 
+        semiaxes = vec([1 1])
+        E = Ellipse(semiaxes, center=[0 0]) 
+
+        @test E.conicform.A == 1
+        @test E.conicform.B == 0
+        @test E.conicform.C == 1
+        @test E.conicform.D == 0
+        @test E.conicform.E == 0
+
+        @test E.quadform.center == vec([0 0])
+        @test E.quadform.S == [1 0; 0 1]
+    end
+
+    @testset "Unit Circle Off Center" begin 
+        semiaxes = vec([1 1])
+        c = vec([1 2])
+        E = Ellipse(semiaxes, center=c) 
+
+        negF = 1 - 1 - 2^2
+        @test E.conicform.A == 1 / negF
+        @test E.conicform.B == 0
+        @test E.conicform.C == 1 / negF
+        @test E.conicform.D == -2 * c[1] / negF
+        @test E.conicform.E == -2 * c[2] / negF
+
+        @test E.quadform.center == c
+        @test E.quadform.S == Matrix(I,2,2)
+    end
+
+    @testset "Horizontal Ellipse" begin 
+        a = 3
+        b = 2
+        semiaxes = vec([a b])
+        c = vec([0 0])
+        E = Ellipse(semiaxes, center=c) 
+
+        @test E.conicform.A == 1/a^2
+        @test E.conicform.B == 0
+        @test E.conicform.C == 1/b^2
+        @test E.conicform.D == 0
+        @test E.conicform.E == 0
+
+        @test E.quadform.center == c
+        @test E.quadform.S == diagm(0 => [1/a^2; 1/b^2])
+    end
+
+    @testset "Vertical Ellipse 1" begin 
+        a = 2
+        b = 3
+        semiaxes = vec([a b])
+        c = vec([0 0])
+        E = Ellipse(semiaxes, center=c) 
+
+        @test E.conicform.A == 1/a^2
+        @test E.conicform.B == 0
+        @test E.conicform.C == 1/b^2
+        @test E.conicform.D == 0
+        @test E.conicform.E == 0
+
+        @test E.quadform.center == c
+        @test isapprox(E.quadform.S, diagm(0 => [1/a^2; 1/b^2]))
+    end
+
+    @testset "Vertical Ellipse 2" begin 
+        a = 3
+        b = 2
+        semiaxes = vec([a b])
+        c = vec([0 0])
+        angle = pi / 2
+        E = Ellipse(semiaxes, center=c, ccw_angle=angle)
+
+        @test E.conicform.A == 1/b^2
+        @test isapprox(E.conicform.B, 0., atol = 1e-5)
+        @test E.conicform.C == 1/a^2
+        @test E.conicform.D == 0
+        @test E.conicform.E == 0
+
+        @test E.quadform.center == c
+        @test isapprox(E.quadform.S, diagm(0 => [1/b^2; 1/a^2]))
+    end
+
+    @testset "CCW Rotation 45 deg" begin 
+        a = 2
+        b = 3
+        semiaxes = vec([a b])
+        c = vec([0 0])
+        angle = pi / 4
+        E = Ellipse(semiaxes, center=c, ccw_angle=angle)
+
+        S = rotation_mat(angle) * diagm(0 => 1 ./semiaxes.^2) * rotation_mat(angle)'
+
+        @test E.conicform.A == S[1,1]
+        @test isapprox(E.conicform.B, (S[1,2] + S[2,1]), atol = 1e-5)
+        @test E.conicform.C == S[2,2]
+        @test E.conicform.D == 0
+        @test E.conicform.E == 0
+
+        @test E.quadform.center == c
+        @test isapprox(E.quadform.S, S)
+    end
+
+    @testset "CCW Rotation -45 deg" begin 
+        a = 2
+        b = 3
+        semiaxes = vec([a b])
+        c = vec([0 0])
+        angle = -pi / 4
+        E = Ellipse(semiaxes, center=c, ccw_angle=angle)
+
+        S = rotation_mat(angle) * diagm(0 => 1 ./semiaxes.^2) * rotation_mat(angle)'
+
+        @test E.conicform.A == S[1,1]
+        @test isapprox(E.conicform.B, (S[1,2] + S[2,1]), atol = 1e-5)
+        @test E.conicform.C == S[2,2]
+        @test E.conicform.D == 0
+        @test E.conicform.E == 0
+
+        @test E.quadform.center == c
+        @test isapprox(E.quadform.S, S)
+    end
+
+end
+
+@testset "Ellipse Concic Form Creation" begin
+    @testset "Unit Circle" begin 
+        A = 1
+        B = 0
+        C = 1
+        D = 0
+        E = 0
+
+        E = Ellipse(A, B, C, D, E)
+
+        @test E.parametricform.center == vec([0 0])
+        @test isapprox(E.parametricform.semiaxis_lengths, vec([1 1]))
+
+        @test E.quadform.center == vec([0 0])
+        @test E.quadform.S == [1 0; 0 1]
+    end
 end
