@@ -96,30 +96,33 @@ end
 function quad2parametric(qform::QuadraticFormEllipse)
     #= Helper for converting from quadratic form to parameteric form of ellipse
  
-     Given an ellipse as a quadratic form 
+    Given an ellipse as a quadratic form 
  
-             (x - c)^T S (x - c) = 1
+            (x - c)^T S (x - c) = 1
  
-     convert it to the parametric form
+    convert it to the parametric form
  
-             [x_c y_c] + rotation_mat(ccw_angle) * [a*cos(theta) b*sin(theta)]
+            [x_c y_c] + rotation_mat(ccw_angle) * [a*cos(theta) b*sin(theta)]
  
-     Args :
-         qform : quadratic form ellipse to be converted to conic form 
+    Args :
+        qform : quadratic form ellipse to be converted to conic form 
  
-     Returns :
-         parametric form ellipse
-     =#
+    Returns :
+        parametric form ellipse
+    =#
  
-     f = eigen(qform.S);
-     V = f.vectors;
-     D = f.values;
+    f = eigen(qform.S)
+    V = f.vectors
+    D = f.values                
  
-     semiaxis_lengths = sqrt.(elementwise_pseudoinvert(D));
-     major_axis = V[:,1]
-     ccw_angle = atan(major_axis[2], major_axis[1]);
+    semiaxis_lengths = sqrt.(elementwise_pseudoinvert(D))
+    p = sortperm(semiaxis_lengths, rev=true)
+    sorted_semiaxes = semiaxis_lengths[p]
+    sorted_eig_vecs = V[:,p]
+    major_axis = sorted_eig_vecs[:,1]
+    ccw_angle = atan(major_axis[2], major_axis[1])
  
-     return ParametricFormEllipse(semiaxis_lengths,qform.center, ccw_angle)
+    return ParametricFormEllipse(sorted_semiaxes, qform.center, ccw_angle)
 end
 
 function conic2quad(cform::ConicFormEllipse)
@@ -135,7 +138,7 @@ function conic2quad(cform::ConicFormEllipse)
 
     This is done by completing the square leading to the following equivalence
             x^T * Q * x + b^T * x + c = 0
-        =>  (x + 0.5 * inv(Q) * b)^T Q (x + 0.5 * inv(Q) * b)) + c - 0.25 * b^T * inv(A) * b = 0
+        =>  (x + 0.5 * inv(Q) * b)^T Q (x + 0.5 * inv(Q) * b)) + c - 0.25 * b^T * inv(Q) * b = 0
     
     Args :
 
@@ -149,14 +152,14 @@ function conic2quad(cform::ConicFormEllipse)
     D = cform.D
     E = cform.E
 
-    Q = [A B/2; B/2 C];
-    b = [D; E];
+    Q = [A B/2; B/2 C]
+    b = [D; E]
 
-    beta = Q \ b;
-    c = 0.25 * b' * beta;
+    beta = Q \ b
+    rhs = 1 + 0.25 * b' * beta
 
-    S = Q / c;
-    center = -0.5 * beta;
+    S = Q / rhs
+    center = -0.5 * beta
 
     return QuadraticFormEllipse(S, center)
 end
@@ -184,7 +187,7 @@ function conic2parametric(cform::ConicFormEllipse)
                     the positive x-axis           
     =#
 
-    qform = conic2quad(cform);
+    qform = conic2quad(cform)
     return quad2parametric(qform)
 end
 
@@ -205,10 +208,10 @@ function parametric2quad(pform::ParametricFormEllipse)
        
     =#
 
-    sqrtD = diagm(0 => vec(pform.semiaxis_lengths));
-    invD = elementwise_pseudoinvert(sqrtD .^ 2);
-    V = rotation_mat(pform.ccw_angle);
-    S = V * invD * V';
+    sqrtD = diagm(0 => vec(pform.semiaxis_lengths))
+    invD = elementwise_pseudoinvert(sqrtD .^ 2)
+    V = rotation_mat(pform.ccw_angle)
+    S = V * invD * V'
 
     return QuadraticFormEllipse(S, pform.center)
 end
@@ -255,7 +258,7 @@ function Ellipse(A::T, B::T, C::T, D::T, E::T) where T<: Real
     return Ellipse(quadform, conicform, parametricform)
 end
 
-function Ellipse(semiaxis_lengths::Array{T}, center=[0 0], ccw_angle=0) where T<:Real
+function Ellipse(semiaxis_lengths::Array{T}; center=[0 0], ccw_angle=0) where T<:Real
     parametricform = ParametricFormEllipse(semiaxis_lengths, center, ccw_angle)
     quadform = parametric2quad(parametricform)
     conicform = parametric2conic(parametricform)
