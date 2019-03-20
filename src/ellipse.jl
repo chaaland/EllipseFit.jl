@@ -36,7 +36,7 @@ struct ConicFormEllipse{T<:Real}
         new{T}(A, B, C, D, E)
     end
 end
-ConicFormEllipse(A::Real, B::Real, C::Real, D::Real, E::Real) = ConicFormEllipse(promote(A, B, C, D, E))
+ConicFormEllipse(A::Real, B::Real, C::Real, D::Real, E::Real) = ConicFormEllipse(promote(A, B, C, D, E)...)
 
 struct ParametricFormEllipse{T<:Real, U<:Real, V<:Real}
     semiaxis_lengths::Array{T}
@@ -257,6 +257,7 @@ function Ellipse(A::T, B::T, C::T, D::T, E::T) where T<: Real
     parametricform = conic2parametric(conicform)
     return Ellipse(quadform, conicform, parametricform)
 end
+Ellipse(A::Real, B::Real, C::Real, D::Real, E::Real) = Ellipse(promote(A, B, C, D, E)...)
 
 function Ellipse(semiaxis_lengths::Array{T}; center=[0 0], ccw_angle=0) where T<:Real
     parametricform = ParametricFormEllipse(semiaxis_lengths, center, ccw_angle)
