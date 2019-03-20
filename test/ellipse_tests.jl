@@ -297,4 +297,99 @@ end
         @test E.quadform.center == vec([0 0])
         @test E.quadform.S == [1 0; 0 1]
     end
+
+    @testset "Horizontal Ellipse" begin 
+        A = 1/4
+        B = 0
+        C = 1
+        D = 0
+        E = 0
+
+        ellipse = Ellipse(A, B, C, D, E)
+
+        @test ellipse.parametricform.center == vec([0 0])
+        @test isapprox(ellipse.parametricform.semiaxis_lengths, vec([2 1]))
+        @test isapprox((ellipse.parametricform.ccw_angle + 2*pi) % pi, 0)
+
+        @test ellipse.quadform.center == vec([0 0])
+        @test ellipse.quadform.S == [A B/2; B/2 C]
+    end
+
+    @testset "Vertical Ellipse" begin 
+        A = 1
+        B = 0
+        C = 1/4
+        D = 0
+        E = 0
+
+        ellipse = Ellipse(A, B, C, D, E)
+
+        @test ellipse.parametricform.center == vec([0 0])
+        @test isapprox(ellipse.parametricform.semiaxis_lengths, vec([2 1]))
+        @test isapprox((ellipse.parametricform.ccw_angle + 2*pi) % pi, pi/2)
+
+        @test ellipse.quadform.center == vec([0 0])
+        @test ellipse.quadform.S == [A B/2; B/2 C]
+    end
+
+    @testset "Horizontal off center" begin 
+        A = 1/4 / (-1/4)
+        B = 0
+        C = 1 / (-1/4)
+        D = -2 * 1/4 / (-1/4)
+        E = -2 * -1 / (-1/4)
+
+        ellipse = Ellipse(A, B, C, D, E)
+
+        @test ellipse.parametricform.center == vec([1 -1])
+        @test isapprox(ellipse.parametricform.semiaxis_lengths, vec([2 1]))
+        @test isapprox((ellipse.parametricform.ccw_angle + 2*pi) % pi, 0)
+
+        @test ellipse.quadform.center == vec([1 -1])
+        @test ellipse.quadform.S == diagm(0 => vec([1/4 1]))
+    end
+
+    @testset "CCW Rotation 45 deg" begin 
+        angle = pi / 4
+        a = 3
+        b = 2
+        semiaxes = vec([a b])
+        S = rotation_mat(angle) * diagm(0 => 1 ./semiaxes.^2) * rotation_mat(angle)'
+        A = S[1,1]
+        B = (S[1,2] + S[2,1])
+        C = S[2,2]
+        D = 0
+        E = 0
+
+        ellipse = Ellipse(A, B, C, D, E)
+
+        @test ellipse.parametricform.center == vec([0 0])
+        @test isapprox(ellipse.parametricform.semiaxis_lengths, vec([a b]))
+        @test isapprox((ellipse.parametricform.ccw_angle + 2*pi) % pi, angle)
+
+        @test ellipse.quadform.center == vec([0 0])
+        @test ellipse.quadform.S == [A B/2; B/2 C]
+    end
+
+    @testset "CCW Rotation -45 deg" begin 
+        angle = -pi / 4
+        a = 3
+        b = 2
+        semiaxes = vec([a b])
+        S = rotation_mat(angle) * diagm(0 => 1 ./semiaxes.^2) * rotation_mat(angle)'
+        A = S[1,1]
+        B = (S[1,2] + S[2,1])
+        C = S[2,2]
+        D = 0
+        E = 0
+
+        ellipse = Ellipse(A, B, C, D, E)
+
+        @test ellipse.parametricform.center == vec([0 0])
+        @test isapprox(ellipse.parametricform.semiaxis_lengths, vec([a b]))
+        @test isapprox((ellipse.parametricform.ccw_angle + 2*pi) % pi, (angle + 2*pi) % pi)
+
+        @test ellipse.quadform.center == vec([0 0])
+        @test ellipse.quadform.S == [A B/2; B/2 C]
+    end
 end
