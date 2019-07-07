@@ -1,5 +1,5 @@
 # Small script demonstrating how to use the module to plot ellipses. 
-# Generate a covariance matrix and uses it to plo confidence ellipsoids 
+# Generate a covariance matrix and uses it to plot confidence ellipsoids 
 # for a chi-squared distribution with 2 degrees of freedom.
 
 using PyPlot

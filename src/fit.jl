@@ -6,18 +6,20 @@ include("solvers.jl")
 include("solvers/levenbergmarquardt.jl")
 include("solvers/gaussnewton.jl")
 
+export EllipseModel, fit!
+
 mutable struct EllipseModel
     X::Array{Real,2}
-    objective::Objective
-    solver::Solver 
+    objective
+    solver 
     solution::Union{Ellipse,Nothing}
 
     function EllipseModel(
         X::Array{T,2},
-        objective::Objective,
-        solver::Solver, 
+        objective,
+        solver,
         solution::Union{Ellipse,Nothing}=nothing,
-    ) where T <: Real
+    ) where {T <: Real}
         N, n = size(X)
         if n != 2
             error("Expected an array with second dimension 2")
@@ -27,8 +29,10 @@ mutable struct EllipseModel
 end
 
 function fit!(model::EllipseModel)
-    if model.objective == Objective.LeastSquares
-       A, B, C, D, E, F = leastsquares(model.X, model.solver)
+    println(model.objective)
+    if model.objective == LeastSquares
+
+       A, B, C, D, E = leastsquares(model.X, model.solver)
        model.solution = Ellipse(A, B, C, D, E)
     # elseif model.objective == Objective.OrthogonalEuclideanDistance
     #     semiaxis_lengths, center, ccw_angle = orthogonaldist(model.X, model.solver)
@@ -38,7 +42,7 @@ function fit!(model::EllipseModel)
     end
 end
 
-function leastsquares(X::Array{T,2}, solver::Solver=NormalEquations) where T <: Real
+function leastsquares(X::Array{T,2}, solver=NormalEquations) where T <: Real
     #= Fit an ellipse to data using least least squares fit
 
     Set up a least squares problem of the form ||A x - b||^2 where 
@@ -82,7 +86,7 @@ function leastsquares(X::Array{T,2}, solver::Solver=NormalEquations) where T <: 
     end
 end
 
-function orthogonaldist(X::Array{T,2}, solver::Solver=LevenbergMarquardt) where T <: Real
+function orthogonaldist(X::Array{T,2}, solver=LevenbergMarquardt) where T <: Real
     #= Fit an ellipse by minimizing the orthogonal distance of the points 
 
     Rather than least squares, the ellipse is fit so as to minimize the 
