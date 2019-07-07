@@ -1,5 +1,5 @@
 export Objective
-export LeastSquares, OrthogonalDistance
+export LeastSquares, OrthogonalEuclideanDistance
 export Solver
 export NormalEquations, GradientDescent, GaussNewton, LevenbergMarquardt
 
@@ -7,7 +7,7 @@ export NormalEquations, GradientDescent, GaussNewton, LevenbergMarquardt
 abstract type Objective end
 
 struct LeastSquares <: Objective end
-struct OrthogonalDistance <: Objective end
+struct OrthogonalEuclideanDistance <: Objective end
 
 # Solver subtypes 
 abstract type Solver end
@@ -24,7 +24,7 @@ struct GradientDescent <: Solver
         if alpha < 0
             error("Expected argument 'alpha' to be nonnegative")
         elseif iterations < 1
-            error("Expected argument 'iterations' to be nonnegative")
+            error("Expected argument 'iterations' to be positive")
         elseif atol <= 0
             error("Expected argument 'atol' to be positive")
         end

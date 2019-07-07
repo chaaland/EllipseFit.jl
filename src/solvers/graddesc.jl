@@ -1,7 +1,15 @@
 include("../utils.jl")
 
 
-function graddesc(input_dim::T, f::Function, grad::Function; alpha=0.1, xinit=Inf, max_iters=1000, atol=1e-6) where T <: Int64
+function graddesc(
+    input_dim::T,
+    f::Function,
+    grad::Function;
+    alpha=0.1,
+    xinit=Inf,
+    max_iters=1000,
+    atol=1e-6,
+) where T <: Int64
     #= Perform gradient descent to find minimum of a function
     
     Args :

@@ -129,7 +129,7 @@ using Test
 
         @test E.parametricform.center == c
         @test isapprox(E.parametricform.semiaxis_lengths, vec([a b]))
-        @test isapprox((E.parametricform.ccw_angle + 2*pi)% pi, ccw_angle)
+        @test isapprox((E.parametricform.ccw_angle + 2*pi) % pi, ccw_angle)
     end
 
     @testset "CCW Rotation -45 deg" begin
@@ -281,7 +281,7 @@ end
 
 end
 
-@testset "Ellipse Concic Form Creation" begin
+@testset "Ellipse Conic Form Creation" begin
     @testset "Unit Circle" begin 
         A = 1
         B = 0

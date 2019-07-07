@@ -12,8 +12,12 @@ mutable struct EllipseModel
     solver::Solver 
     solution::Union{Ellipse,Nothing}
 
-    function EllipseModel(X::Array{T,2}, objective::Objective, solver::Solver, 
-                           solution::Union{Ellipse,Nothing}=nothing) where T <: Real
+    function EllipseModel(
+        X::Array{T,2},
+        objective::Objective,
+        solver::Solver, 
+        solution::Union{Ellipse,Nothing}=nothing,
+    ) where T <: Real
         N, n = size(X)
         if n != 2
             error("Expected an array with second dimension 2")
@@ -26,7 +30,7 @@ function fit!(model::EllipseModel)
     if model.objective == Objective.LeastSquares
        A, B, C, D, E, F = leastsquares(model.X, model.solver)
        model.solution = Ellipse(A, B, C, D, E)
-    # elseif model.objective == Objective.OrthogonalDistance
+    # elseif model.objective == Objective.OrthogonalEuclideanDistance
     #     semiaxis_lengths, center, ccw_angle = orthogonaldist(model.X, model.solver)
     #     model.solution = Ellipse(center, semiaxis_lengths, ccw_angle)
     else

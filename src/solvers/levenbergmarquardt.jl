@@ -1,7 +1,14 @@
 include("../utils.jl");
 
 
-function levenbergmarquardt(input_output_shape::Tuple{Int64,Int64}, f::Function, J::Function; xinit=Inf, max_iters=1000, atol=1e-6)
+function levenbergmarquardt(
+    input_output_shape::Tuple{Int64,Int64},
+    f::Function,
+    J::Function;
+    xinit=Inf,
+    max_iters=1000,
+    atol=1e-6,
+)
     #= Implements the levenberg marquardt heuristic for finding roots of m nonlinear equations in n unknowns
     
     Args :
