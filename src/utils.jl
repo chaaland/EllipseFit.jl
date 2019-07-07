@@ -110,26 +110,26 @@ function elementwise_pseudoinvert(v::AbstractArray, tol=1e-10)
     return reciprocal / m;
 end
 
-# function random_ellipse(numpoints=50)
-#     #= Example function for plotting data roughly corresponding to an ellipse plus noise
+function random_ellipse(numpoints=50)
+    #= Example function for plotting data roughly corresponding to an ellipse plus noise
 
-#     Helper function used to generate noisy ellipse data with sample points drawn from 
-#     a uniform radial distribution
+    Helper function used to generate noisy ellipse data with sample points drawn from 
+    a uniform radial distribution
 
-#     Args :
-#         num_points : an integer indicating the number of xy pairs on the ellipse to return    
-#     Returns :
-#         A 2 x numpoints array where the x and y coordinates are in the 1st and 2nd row 
-#         respectively
-#     =# 
+    Args :
+        num_points : an integer indicating the number of xy pairs on the ellipse to return    
+    Returns :
+        A 2 x numpoints array where the x and y coordinates are in the 1st and 2nd row 
+        respectively
+    =# 
 
-#     semiaxis_lengths = vec(rand(1:10,2))
-#     center = vec(rand(-2:2, 2));
-#     ccw_angle = 2 * pi * rand();
+    semiaxis_lengths = vec(rand(1:10,2))
+    center = vec(rand(-2:2, 2));
+    ccw_angle = 2 * pi * rand();
 
-#     theta = 2 * pi * vec(rand(numpoints));
-#     onaxis_ellipse = semiaxis_lengths .* [cos.(theta) sin.(theta)]';
-#     epsilon = 0.3 * randn(2, numpoints);
+    theta = 2 * pi * vec(rand(numpoints));
+    onaxis_ellipse = semiaxis_lengths .* [cos.(theta) sin.(theta)]';
+    epsilon = 0.3 * randn(2, numpoints);
     
-#     return  center' .+ rotation_mat(ccw_angle) * onaxis_ellipse' + epsilon'
-# end
+    return  center' .+ rotation_mat(ccw_angle) * onaxis_ellipse' + epsilon'
+end

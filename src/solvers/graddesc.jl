@@ -1,5 +1,6 @@
 include("../utils.jl")
 
+export graddesc
 
 function graddesc(
     input_dim::T,
@@ -27,7 +28,6 @@ function graddesc(
         gradnorm : the norm of the gradient along the trajectory
 
     =#
-    
     if any(isinf.(xinit))                 
         xinit = vec(randn(input_dim));
     end
@@ -39,11 +39,7 @@ function graddesc(
     gradnorm = norm(g);
 
     for i in 1:max_iters
-        if input_dim == 1
-            xcurr = xvals[i] - alpha * g;
-        else
-            xcurr = xvals[:,i] - alpha * g;
-        end
+        xcurr = xvals[:,i] - alpha * g;
 
         xvals = hcat(xvals, xcurr);
         fvals = vcat(fvals, f(xcurr));

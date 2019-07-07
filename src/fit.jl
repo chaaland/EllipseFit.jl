@@ -75,7 +75,7 @@ function leastsquares(X::Array{T,2}, solver::Solver=NormalEquations) where T <: 
         E = coeffs[5]
         
         return A, B, C, D, E
-    elseif solver == Solver.GradientDescent
+    elseif solver == GradientDescent
         error("Unsupported solver GradientDescent")
     else
         error("Unsupported solver")

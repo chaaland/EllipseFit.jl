@@ -1,5 +1,6 @@
 include("../utils.jl");
 
+export levenbergmarquardt
 
 function levenbergmarquardt(
     input_output_shape::Tuple{Int64,Int64},

@@ -2,8 +2,6 @@ using PyPlot
 using EllipseFit
 
 include("utils.jl")
-# include("../src/least_squares_fit.jl")
-# include("../src/utils/utils.jl")
 
 #= 
 Small example script demonstrating how to use the module to fit an ellipse

@@ -1,5 +1,6 @@
 include("../utils.jl")
 
+export gaussnewton
 
 function gaussnewton(
     input_output_shape::Tuple{Int64,Int64},
