@@ -37,7 +37,7 @@ struct GaussNewton <: Solver
     atol::Float64
     xinit::Union{Array{Real}, Real}
 
-    function GaussNewton(iterations::Int32, atol::Float64, xinit=Inf::Union{Array{Real}, Real})
+    function GaussNewton(iterations=1000::Int32, atol=1e-6::Float64, xinit=Inf::Union{Array{Real}, Real})
         if iterations < 1
             error("Expected argument 'iterations' to be nonnegative")
         elseif atol <= 0
@@ -52,7 +52,7 @@ struct LevenbergMarquardt <: Solver
     atol::Float64
     xinit::Union{Array{Real}, Real}
 
-    function LevenbergMarquardt(iterations::Int32, atol::Float64, xinit=Inf::Union{Array{Real}, Real})
+    function LevenbergMarquardt(iterations=1000::Int32, atol=1e-6::Float64; xinit=Inf::Union{Array{Real}, Real})
         if iterations < 1
             error("Expected argument 'iterations' to be nonnegative")
         elseif atol <= 0
@@ -67,7 +67,7 @@ struct NewtonRaphson <: Solver
     atol::Float64
     xinit::Union{Array{Real}, Real}
 
-    function NewtonRaphson(iterations::Int32, atol::Float64, xinit=Inf::Union{Array{Real}, Real})
+    function NewtonRaphson(iterations=1000::Int32, atol=1e-6::Float64, xinit=Inf::Union{Array{Real}, Real})
         if iterations < 1
             error("Expected argument 'iterations' to be nonnegative")
         elseif atol <= 0

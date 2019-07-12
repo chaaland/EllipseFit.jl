@@ -7,7 +7,7 @@ include("fit.jl")
 ####################################
 # Utils
 ####################################
-include("utils.jl")    # include the contents of other files in the module
+include("utils.jl")
 
 ####################################
 # Solvers

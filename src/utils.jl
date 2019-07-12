@@ -137,9 +137,10 @@ function noisyellipse(semiaxis_lengths; center=[0 0], ccw_angle=0, numpoints=50)
         error("Parameter 'semiaxis_lengths' must be of size 2");
     end
     
-    theta = 2 * pi * vec(rand(numpoints));
-    onaxis_ellipse = vec(semiaxis_lengths) .* [cos.(theta) sin.(theta)]';
-    epsilon = 0.3 * randn(2, numpoints);
-    
-    return  vec(center)' .+ (rotation_mat(ccw_angle) * onaxis_ellipse)' + epsilon';
+    theta = 2 * pi * vec(rand(numpoints))
+    onaxis_ellipse = vec(semiaxis_lengths) .* [cos.(theta) sin.(theta)]'
+    epsilon = 0.3 * randn(2, numpoints)
+    noisy_ellipse_coords = vec(center)' .+ (rotation_mat(ccw_angle) * onaxis_ellipse)' + epsilon'
+
+    return noisy_ellipse_coords
 end

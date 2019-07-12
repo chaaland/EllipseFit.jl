@@ -1,7 +1,8 @@
 using LinearAlgebra
+using PyPlot
 include("utils.jl")
 
-export Ellipse, QuadraticFormEllipse, ConicFormEllipse, ParametricFormEllipse
+export Ellipse, QuadraticFormEllipse, ConicFormEllipse, ParametricFormEllipse, ellipse_to_plot_points
 
 struct QuadraticFormEllipse{T<:Real, U<:Real}
     S::Array{T,2}
@@ -265,3 +266,17 @@ function Ellipse(semiaxis_lengths::Array{T}; center=[0 0], ccw_angle=0) where T<
     conicform = parametric2conic(parametricform)
     return Ellipse(quadform, conicform, parametricform)
 end
+
+function ellipse_to_plot_points(ellipse::Ellipse; n=1000::Int)
+    theta_plot_vals = range(0, 2*pi, length=n)
+    unit_circle = [cos.(theta_plot_vals) sin.(theta_plot_vals)]'
+    p = ellipse.parametricform
+    onaxis_ellipse = vec(p.semiaxis_lengths) .* unit_circle
+    U = rotation_mat(p.ccw_angle)
+    rotated_ellipse = (U * onaxis_ellipse)'
+    shifted_ellipse = vec(p.center)' .+ rotated_ellipse
+    return shifted_ellipse
+    # shifted ellipse = vec(p.center)' .+ rotated_ellipse
+end
+    
+    # return  vec(p.center)' .+ end
