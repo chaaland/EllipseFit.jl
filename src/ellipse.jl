@@ -245,7 +245,7 @@ struct Ellipse
     parametricform::ParametricFormEllipse
 end
 
-function Ellipse(S::Array{T,2}, center=[0 0]::Array{U}) where {T<:Real, U<:Real}
+function Ellipse(S::Array{T,2}; center=[0 0]::Array{U}) where {T<:Real, U<:Real}
     quadform = QuadraticFormEllipse(S, center)
     conicform = quad2conic(quadform)
     parametricform = quad2parametric(quadform)
@@ -260,7 +260,7 @@ function Ellipse(A::T, B::T, C::T, D::T, E::T) where T<: Real
 end
 Ellipse(A::Real, B::Real, C::Real, D::Real, E::Real) = Ellipse(promote(A, B, C, D, E)...)
 
-function Ellipse(semiaxis_lengths::Array{T}; center=[0 0], ccw_angle=0) where T<:Real
+function Ellipse(semiaxis_lengths::Array{T,1}; center=[0 0], ccw_angle=0) where T<:Real
     parametricform = ParametricFormEllipse(semiaxis_lengths, center, ccw_angle)
     quadform = parametric2quad(parametricform)
     conicform = parametric2conic(parametricform)
@@ -275,8 +275,6 @@ function ellipse_to_plot_points(ellipse::Ellipse; n=1000::Int)
     U = rotation_mat(p.ccw_angle)
     rotated_ellipse = (U * onaxis_ellipse)'
     shifted_ellipse = vec(p.center)' .+ rotated_ellipse
+
     return shifted_ellipse
-    # shifted ellipse = vec(p.center)' .+ rotated_ellipse
 end
-    
-    # return  vec(p.center)' .+ end

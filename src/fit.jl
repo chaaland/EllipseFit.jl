@@ -28,14 +28,15 @@ end
 
 function fit(model::EllipseModel)
     if model.objective == LeastSquares
-
        A, B, C, D, E = leastsquares(model.X, model.solver)
        return Ellipse(A, B, C, D, E)
-    # elseif model.objective == Objective.OrthogonalEuclideanDistance
-    #     semiaxis_lengths, center, ccw_angle = orthogonaldist(model.X, model.solver)
-    #     model.solution = Ellipse(center, semiaxis_lengths, ccw_angle)
+    elseif model.objective == OrthogonalEuclideanDistance
+        center, semiaxis_lengths, ccw_angle = orthogonaldist(model.X, model.solver)
+        println(semiaxis_lengths)
+        return Ellipse(semiaxis_lengths, center=center, ccw_angle=ccw_angle)
+        # semiaxis_lengths::Array{T}; center=[0 0], ccw_angle=0
     else
-        error("Unsupported solver type")
+        error("Unsupported objective type")
     end
 end
 
@@ -67,7 +68,7 @@ function leastsquares(X::Array{T,2}, solver=NormalEquations) where T <: Real
     A = hcat(x .^ 2, x .* y, y .^ 2, x, y)
     b = ones(N)
 
-    if solver == NormalEquations
+    if typeof(solver) == NormalEquations
         coeffs = A \ b
         
         A = coeffs[1]
@@ -77,7 +78,7 @@ function leastsquares(X::Array{T,2}, solver=NormalEquations) where T <: Real
         E = coeffs[5]
         
         return A, B, C, D, E
-    elseif solver == GradientDescent
+    elseif typeof(solver) == GradientDescent
         error("Unsupported solver GradientDescent")
     else
         error("Unsupported solver")
@@ -88,7 +89,7 @@ function orthogonaldist(X::Array{T,2}, solver=LevenbergMarquardt) where T <: Rea
     #= Fit an ellipse by minimizing the orthogonal distance of the points 
 
     Rather than least squares, the ellipse is fit so as to minimize the 
-    perpendicular distance of all the measured points an ellipse. This is
+    perpendicular distance of all the measured points to an ellipse. This is
     an example of an errors in variables model which accounts for measurement
     error in both the independent and dependent variables
 
@@ -107,17 +108,28 @@ function orthogonaldist(X::Array{T,2}, solver=LevenbergMarquardt) where T <: Rea
         error("Expected array with second dimension 2")
     end
 
-    num_params = 5 + N             # xcenter, ycenter, angle, semi major, semi minor + theta per data point
-    num_equalities = 2 * N
-    thetavals_lm, fvals_lm, gradnorm_lm, lambdavals_lm = 
-                                    levenbergmarquardt((num_params, num_equalities), z -> parametric_ellipse(z,X), 
-                                                        jacobian_ellipse; xinit=Inf, max_iters=100, atol=1e-6)
+    n_params = 5 + N             # xcenter, ycenter, semi major, semi minor , angle + theta per data point
+    n_equalities = 2 * N
+    # println(solver.atol)
+    if typeof(solver) == LevenbergMarquardt
+        thetavals_lm, fvals_lm, gradnorm_lm, lambdavals_lm = levenbergmarquardt(
+            (n_params, n_equalities), 
+            z -> parametric_ellipse(z,X), 
+            jacobian_ellipse; 
+            xinit=solver.xinit,
+            max_iters=solver.iterations,
+            atol=solver.atol,
+        )
 
-    center = vec(thetavals_lm[1:2,end])
-    semiaxis_lengths = vec(thetavals_lm[3:4,end])
-    ccw_angle = thetavals_lm[5, end]
+        final_params = thetavals_lm[:,end]
+        center = vec(final_params[1:2])
+        semiaxis_lengths = vec(final_params[3:4])
+        ccw_angle = final_params[5]
 
-    return center, semiaxis_lengths, ccw_angle
+        return center, semiaxis_lengths, ccw_angle
+    else
+        error("Unsupported solver")
+    end
 end
 
 function parametric_ellipse(x::Vector{T}, data) where T <: Real
@@ -127,10 +139,11 @@ function parametric_ellipse(x::Vector{T}, data) where T <: Real
     theta = x[6:end]
     
     onaxis_ellipse = diagm(0 => vec(semiaxis_lengths)) * [cos.(theta)'; sin.(theta)']
-    rotated_ellipse = rotation_mat(ccw_angle) * onaxis_ellipse
+    U = rotation_mat(ccw_angle)
+    rotated_ellipse = U * onaxis_ellipse
     shifted_ellipse = center .+ rotated_ellipse
 
-    return vec(shifted_ellipse) - vec(x')
+    return vec(shifted_ellipse) - vec(data')
 end
 
 function jacobian_ellipse(x::Vector{T}) where T <: Real
@@ -153,7 +166,7 @@ function jacobian_ellipse(x::Vector{T}) where T <: Real
         theta_val = theta[i]
         val1 = -a * cos.(ccw_angle) * sin.(theta_val) - b * sin.(ccw_angle) * cos.(theta_val)
         val2 = -a * sin.(ccw_angle) * sin.(theta_val) + b * cos.(ccw_angle) * cos.(theta_val)
-        dtheta[2*i-1:2*i, i] = [val1 val2]
+        dtheta[2 * i - 1:2 * i, i] = [val1 val2]
     end
 
     J = [dxc dyc da db dalpha dtheta]

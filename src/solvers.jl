@@ -50,9 +50,9 @@ end
 struct LevenbergMarquardt <: Solver
     iterations::Int32
     atol::Float64
-    xinit::Union{Array{Real}, Real}
+    xinit
 
-    function LevenbergMarquardt(iterations=1000::Int32, atol=1e-6::Float64; xinit=Inf::Union{Array{Real}, Real})
+    function LevenbergMarquardt(iterations=1000::Int, atol=1e-6::Float64; xinit=Inf)
         if iterations < 1
             error("Expected argument 'iterations' to be nonnegative")
         elseif atol <= 0

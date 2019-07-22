@@ -7,7 +7,6 @@ using Distributions
 using Random
 using EllipseFit
 
-# ion()
 # Set seed for reproducibility
 Random.seed!(3084021)
 
@@ -23,16 +22,18 @@ precision = inv(covariance);
 # Specify mean and degrees of freedom for distribution
 mu = [-1 0.5];
 
-figure(figsize=(10,10));
+fig = figure(figsize=(7,7));
 
 # Plot confidence ellipses 
 for p = pvals
     alpha = cquantile(Chisq(dof), (1 - p)/2.0);         # Probability in right tail
     S = precision / alpha;
-    X = ellipse_from_quadform(S, center=mu);
-    plot(X[:,1], X[:,2], label="p = $p");
+    
+    confidence_ellipse = Ellipse(S, center=mu)
+    X_plot = ellipse_to_plot_points(confidence_ellipse) #, n=n_plot_points)
+    plot(X_plot[:,1], X_plot[:,2], label="p = $p");
 end
-# scatter(mu[1], mu[2]);
+scatter(mu[1], mu[2]);
 
 legend();
 title(L"$(x-\mu)^T \Sigma^{-1}(x-\mu) = F_{\chi^2_2}(p)$ confidence ellipsoids",fontsize=14);
@@ -42,6 +43,5 @@ ylabel(L"$y$",fontsize=14);
 grid(true, which="major");
 grid(true, which="minor",linestyle="--");
 PyPlot.minorticks_on();
-
+display(fig)
 savefig("img/confidence_ellipsoids.png");
-close();
