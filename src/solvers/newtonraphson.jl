@@ -1,8 +1,15 @@
-include("../utils/utils.jl")
+include("../utils.jl")
 
 
-function newton_raphson(input_dim::T, f::Function, J::Function, H::Function; 
-                        xinit=Inf, max_iters=10, atol=1e-6) where T <: Int64
+function newtonraphson(
+    input_dim::T,
+    f::Function,
+    J::Function,
+    H::Function; 
+    xinit=Inf,
+    max_iters=10,
+    atol=1e-6,
+) where T <: Int64
     #= Use the newton raphson method to find extrema
     
     The Newton-Raphson method takes into account second order information to 

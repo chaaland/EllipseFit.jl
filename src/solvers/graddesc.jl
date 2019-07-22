@@ -1,7 +1,16 @@
-include("../utils/utils.jl")
+include("../utils.jl")
 
+export graddesc
 
-function grad_desc(input_dim::T, f::Function, grad::Function; alpha=0.1, xinit=Inf, max_iters=1000, atol=1e-6) where T <: Int64
+function graddesc(
+    input_dim::T,
+    f::Function,
+    grad::Function;
+    alpha=0.1,
+    xinit=Inf,
+    max_iters=1000,
+    atol=1e-6,
+) where T <: Int64
     #= Perform gradient descent to find minimum of a function
     
     Args :
@@ -19,7 +28,6 @@ function grad_desc(input_dim::T, f::Function, grad::Function; alpha=0.1, xinit=I
         gradnorm : the norm of the gradient along the trajectory
 
     =#
-    
     if any(isinf.(xinit))                 
         xinit = vec(randn(input_dim));
     end
@@ -31,11 +39,7 @@ function grad_desc(input_dim::T, f::Function, grad::Function; alpha=0.1, xinit=I
     gradnorm = norm(g);
 
     for i in 1:max_iters
-        if input_dim == 1
-            xcurr = xvals[i] - alpha * g;
-        else
-            xcurr = xvals[:,i] - alpha * g;
-        end
+        xcurr = xvals[:,i] - alpha * g;
 
         xvals = hcat(xvals, xcurr);
         fvals = vcat(fvals, f(xcurr));

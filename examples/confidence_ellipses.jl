@@ -1,49 +1,47 @@
-# include("../src/utils/quadform2ellipse_coords.jl");
-# include("../src/utils/utils.jl");
+# Small script demonstrating how to use the module to plot ellipses. 
+# Generate a covariance matrix and uses it to plot confidence ellipsoids 
+# for a chi-squared distribution with 2 degrees of freedom.
 
 using PyPlot
 using Distributions
+using Random
 using EllipseFit
 
-#= 
-Small script demonstrating how to use the module to plot ellipses. 
-This script generates a covariance matrix and uses it to plot the various
-confidence ellipsoids for a chi-squared distribution with 2 degrees of 
-freedom.
-=#
+# Set seed for reproducibility
+Random.seed!(3084021)
 
+# Set some false positive rates (1 - p)
 pvals = [0.85, 0.9, 0.95, 0.99];
 
 # Generate positive semidefinite covariance matrix
-V = rotate_mat2d(pi/3);
-D = diagm(0 => vec([3/4 1/4]));
-covariance = V * D * V';
+dof = 2;
+R = rand(dof, dof);
+covariance = R' * R;
 precision = inv(covariance);
 
 # Specify mean and degrees of freedom for distribution
 mu = [-1 0.5];
-dof = 2;
 
-figure(figsize=(10,10))
+fig = figure(figsize=(7,7));
 
-# Plot confidence ellipses for different false positive rates
+# Plot confidence ellipses 
 for p = pvals
-    alpha = cquantile(Chisq(dof), 1-p);         # Probability in right tail
+    alpha = cquantile(Chisq(dof), (1 - p)/2.0);         # Probability in right tail
     S = precision / alpha;
-    X = quadform2ellipse_coords(S, center=mu);
-    plot(X[1,:], X[2,:], label="p = $p");
+    
+    confidence_ellipse = Ellipse(S, center=mu)
+    X_plot = ellipse_to_plot_points(confidence_ellipse) #, n=n_plot_points)
+    plot(X_plot[:,1], X_plot[:,2], label="p = $p");
 end
-
 scatter(mu[1], mu[2]);
 
 legend();
-title(L"$(x-\mu)^T \Sigma^{-1}(x-\mu) = F_{\chi^2_2}(p)$ confidence ellipsoids");
-xlabel(L"$x$");
-ylabel(L"$y$");
+title(L"$(x-\mu)^T \Sigma^{-1}(x-\mu) = F_{\chi^2_2}(p)$ confidence ellipsoids",fontsize=14);
+xlabel(L"$x$",fontsize=14);
+ylabel(L"$y$",fontsize=14);
 
-xlim(-3,3);
-ylim(-3,3);
-grid(true);
-
-savefig("../img/confidence_ellipsoids.png");
-close();
+grid(true, which="major");
+grid(true, which="minor",linestyle="--");
+PyPlot.minorticks_on();
+display(fig)
+savefig("img/confidence_ellipsoids.png");

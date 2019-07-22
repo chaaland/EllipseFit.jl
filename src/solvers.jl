@@ -1,6 +1,5 @@
-
 export Objective
-export LeastSquares, OrthogonalDistance
+export LeastSquares, OrthogonalEuclideanDistance
 export Solver
 export NormalEquations, GradientDescent, GaussNewton, LevenbergMarquardt
 
@@ -8,7 +7,7 @@ export NormalEquations, GradientDescent, GaussNewton, LevenbergMarquardt
 abstract type Objective end
 
 struct LeastSquares <: Objective end
-struct OrthogonalDistance <: Objective end
+struct OrthogonalEuclideanDistance <: Objective end
 
 # Solver subtypes 
 abstract type Solver end
@@ -19,13 +18,13 @@ struct GradientDescent <: Solver
     alpha::Float64
     iterations::Int32 
     atol::Float64
-    xinit
+    xinit::Union{Array{Real}, Real}
 
-    function GradientDescent(alpha::Float64, iterations::Int32, atol::Float64, xinit=Inf)
+    function GradientDescent(alpha::Float64, iterations::Int32, atol::Float64, xinit=Inf::Union{Array{Real}, Real})
         if alpha < 0
             error("Expected argument 'alpha' to be nonnegative")
         elseif iterations < 1
-            error("Expected argument 'iterations' to be nonnegative")
+            error("Expected argument 'iterations' to be positive")
         elseif atol <= 0
             error("Expected argument 'atol' to be positive")
         end
@@ -36,9 +35,9 @@ end
 struct GaussNewton <: Solver
     iterations::Int32 
     atol::Float64
-    xinit
+    xinit::Union{Array{Real}, Real}
 
-    function GaussNewton(iterations::Int32, atol::Float64, xinit=Inf)
+    function GaussNewton(iterations=1000::Int32, atol=1e-6::Float64, xinit=Inf::Union{Array{Real}, Real})
         if iterations < 1
             error("Expected argument 'iterations' to be nonnegative")
         elseif atol <= 0
@@ -53,7 +52,7 @@ struct LevenbergMarquardt <: Solver
     atol::Float64
     xinit
 
-    function LevenbergMarquardt(iterations::Int32, atol::Float64, xinit=Inf)
+    function LevenbergMarquardt(iterations=1000::Int, atol=1e-6::Float64; xinit=Inf)
         if iterations < 1
             error("Expected argument 'iterations' to be nonnegative")
         elseif atol <= 0
@@ -66,9 +65,9 @@ end
 struct NewtonRaphson <: Solver
     iterations::Int32
     atol::Float64
-    xinit
+    xinit::Union{Array{Real}, Real}
 
-    function NewtonRaphson(iterations::Int32, atol::Float64, xinit=Inf)
+    function NewtonRaphson(iterations=1000::Int32, atol=1e-6::Float64, xinit=Inf::Union{Array{Real}, Real})
         if iterations < 1
             error("Expected argument 'iterations' to be nonnegative")
         elseif atol <= 0

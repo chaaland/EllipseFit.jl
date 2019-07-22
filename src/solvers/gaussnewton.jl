@@ -1,8 +1,15 @@
-include("../utils/utils.jl")
+include("../utils.jl")
 
+export gaussnewton
 
-function gauss_newton(input_output_shape::Tuple{Int64,Int64}, f::Function, J::Function;
-                      xinit=Inf, max_iters=1000, atol=1e-6)
+function gaussnewton(
+    input_output_shape::Tuple{Int64,Int64},
+    f::Function,
+    J::Function;
+    xinit=Inf,
+    max_iters=1000,
+    atol=1e-6,
+)
     #= Use the gauss-newton method to find extrema
     
     The Gauss-Newton method is used to approximately solve the non-linear least
@@ -18,7 +25,7 @@ function gauss_newton(input_output_shape::Tuple{Int64,Int64}, f::Function, J::Fu
         atol : the absolute tolerance of the root mean square of the jacobian
 
     Returns :
-        xvals : the trajectory of the gradient descent
+        xvals : the trajectory of the gauss netwon algo
         fvals : the value of the objective along the trajectory
         stop_criteria : the norm of the jacobian along the trajectory
 
