@@ -32,7 +32,6 @@ function fit(model::EllipseModel)
        return Ellipse(A, B, C, D, E)
     elseif model.objective == OrthogonalEuclideanDistance
         center, semiaxis_lengths, ccw_angle = orthogonaldist(model.X, model.solver)
-        println(semiaxis_lengths)
         return Ellipse(semiaxis_lengths, center=center, ccw_angle=ccw_angle)
         # semiaxis_lengths::Array{T}; center=[0 0], ccw_angle=0
     else
@@ -110,7 +109,6 @@ function orthogonaldist(X::Array{T,2}, solver=LevenbergMarquardt) where T <: Rea
 
     n_params = 5 + N             # xcenter, ycenter, semi major, semi minor , angle + theta per data point
     n_equalities = 2 * N
-    # println(solver.atol)
     if typeof(solver) == LevenbergMarquardt
         thetavals_lm, fvals_lm, gradnorm_lm, lambdavals_lm = levenbergmarquardt(
             (n_params, n_equalities), 
