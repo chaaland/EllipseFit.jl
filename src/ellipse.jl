@@ -27,16 +27,17 @@ struct ConicFormEllipse{T<:Real}
     C::T
     D::T
     E::T
+    F::T
 
-    function ConicFormEllipse(A::T, B::T, C::T, D::T, E::T) where {T<:Real}
+    function ConicFormEllipse(A::T, B::T, C::T, D::T, E::T, F::T) where {T<:Real}
         if B ^2 - 4 * A * C >= 0
             error("Discriminant is non-negative. Input does not denote an ellipse")
         end
 
-        new{T}(A, B, C, D, E)
+        new{T}(A, B, C, D, E, F)
     end
 end
-ConicFormEllipse(A::Real, B::Real, C::Real, D::Real, E::Real) = ConicFormEllipse(promote(A, B, C, D, E)...)
+ConicFormEllipse(A::Real, B::Real, C::Real, D::Real, E::Real, F::Real) = ConicFormEllipse(promote(A, B, C, D, E, F)...)
 
 struct ParametricFormEllipse{T<:Real, U<:Real, V<:Real}
     semiaxis_lengths::Array{T}
@@ -88,9 +89,9 @@ function quad2conic(qform::QuadraticFormEllipse)
     b = -2 * center' * S;
     D = b[1]
     E = b[2]
-    negF = 1 - center' * S * center
+    F = center' * S * center - 1
  
-    return ConicFormEllipse(A/negF, B/negF, C/negF, D/negF, E/negF)
+    return ConicFormEllipse(A, B, C, D, E, F)
 end
 
 function quad2parametric(qform::QuadraticFormEllipse)
@@ -151,12 +152,13 @@ function conic2quad(cform::ConicFormEllipse)
     C = cform.C
     D = cform.D
     E = cform.E
+    F = cform.F
 
     Q = [A B/2; B/2 C]
     b = [D; E]
 
     beta = Q \ b
-    rhs = 1 + 0.25 * b' * beta
+    rhs = 0.25 * b' * beta - F
 
     S = Q / rhs
     center = -0.5 * beta
@@ -244,7 +246,6 @@ struct Ellipse
     parametricform::ParametricFormEllipse
 end
 
-# function Ellipse(S::Array{T,2}; center) where {T<:Real, U<:Real}
 function Ellipse(S::Array{T,2}, center=[0 0]::Array{U}) where {T<:Real, U<:Real}
     quadform = QuadraticFormEllipse(S, center)
     conicform = quad2conic(quadform)
@@ -252,13 +253,13 @@ function Ellipse(S::Array{T,2}, center=[0 0]::Array{U}) where {T<:Real, U<:Real}
     return Ellipse(quadform, conicform, parametricform)
 end
 
-function Ellipse(A::T, B::T, C::T, D::T, E::T) where T<: Real
-    conicform = ConicFormEllipse(A, B, C, D, E)
+function Ellipse(A::T, B::T, C::T, D::T, E::T, F=-1) where T<: Real
+    conicform = ConicFormEllipse(A, B, C, D, E, F)
     quadform = conic2quad(conicform)
     parametricform = conic2parametric(conicform)
     return Ellipse(quadform, conicform, parametricform)
 end
-Ellipse(A::Real, B::Real, C::Real, D::Real, E::Real) = Ellipse(promote(A, B, C, D, E)...)
+Ellipse(A::Real, B::Real, C::Real, D::Real, E::Real, F=-1) = Ellipse(promote(A, B, C, D, E, F)...)
 
 function Ellipse(semiaxis_lengths::Array{T,1}; center=[0 0], ccw_angle=0) where T<:Real
     parametricform = ParametricFormEllipse(semiaxis_lengths, center, ccw_angle)

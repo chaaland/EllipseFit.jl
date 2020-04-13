@@ -28,12 +28,11 @@ end
 
 function fit(model::EllipseModel)
     if model.objective == LeastSquares
-       A, B, C, D, E = leastsquares(model.X, model.solver)
-       return Ellipse(A, B, C, D, E)
+       A, B, C, D, E, F = leastsquares(model.X, model.solver)
+       return Ellipse(A, B, C, D, E, F)
     elseif model.objective == OrthogonalEuclideanDistance
         center, semiaxis_lengths, ccw_angle = orthogonaldist(model.X, model.solver)
         return Ellipse(semiaxis_lengths, center=center, ccw_angle=ccw_angle)
-        # semiaxis_lengths::Array{T}; center=[0 0], ccw_angle=0
     else
         error("Unsupported objective type")
     end
@@ -68,6 +67,7 @@ function leastsquares(X::Array{T,2}, solver=NormalEquations) where T <: Real
     b = ones(N)
 
     if typeof(solver) == NormalEquations
+        # minimise ||Ax - b||_2
         coeffs = A \ b
         
         A = coeffs[1]
@@ -75,8 +75,9 @@ function leastsquares(X::Array{T,2}, solver=NormalEquations) where T <: Real
         C = coeffs[3]
         D = coeffs[4]
         E = coeffs[5]
+        F = -b[1] # F = -1
         
-        return A, B, C, D, E
+        return A, B, C, D, E, F
     elseif typeof(solver) == GradientDescent
         error("Unsupported solver GradientDescent")
     else
