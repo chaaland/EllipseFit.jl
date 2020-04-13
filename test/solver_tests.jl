@@ -47,7 +47,6 @@ end
                 (x[1] + 2) / sqrt((x[1] + 2)^2 + (x[2] - 3)^2), (x[2] - 3) / sqrt((x[1] + 2)^2 + (x[2] - 3)^2)], (2,2))'
 
         xvals, fvals, gradnorms = gaussnewton(shp, f, J, xinit=[1, 0])
-        println(gradnorms)
         @test isapprox(abs(xvals[1,end]), 1.0, atol=1e-6)
         @test isapprox(abs(xvals[2,end]), 1.0, atol=1e-6)
         @test isapprox(gradnorms[end], 0.0, atol=1e-6)
