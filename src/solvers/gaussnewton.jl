@@ -1,5 +1,3 @@
-include("../utils.jl")
-
 export gaussnewton
 
 function gaussnewton(

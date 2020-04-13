@@ -1,6 +1,7 @@
 using EllipseFit
 using LinearAlgebra
 
+
 @testset "root mean square test" begin
 
     @test rmse(zeros(2)) == 0

@@ -1,6 +1,5 @@
 using LinearAlgebra
 using PyPlot
-include("utils.jl")
 
 export Ellipse, QuadraticFormEllipse, ConicFormEllipse, ParametricFormEllipse, ellipse_to_plot_points
 
@@ -245,7 +244,8 @@ struct Ellipse
     parametricform::ParametricFormEllipse
 end
 
-function Ellipse(S::Array{T,2}; center=[0 0]::Array{U}) where {T<:Real, U<:Real}
+# function Ellipse(S::Array{T,2}; center) where {T<:Real, U<:Real}
+function Ellipse(S::Array{T,2}, center=[0 0]::Array{U}) where {T<:Real, U<:Real}
     quadform = QuadraticFormEllipse(S, center)
     conicform = quad2conic(quadform)
     parametricform = quad2parametric(quadform)

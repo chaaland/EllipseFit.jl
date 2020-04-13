@@ -1,6 +1,5 @@
 using EllipseFit
 using LinearAlgebra
-using Test
 
 
 @testset "Test Gradient Desc" begin

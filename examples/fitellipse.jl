@@ -2,7 +2,6 @@ using PyPlot
 using Random
 using EllipseFit
 
-# include("../utils.jl")
 #= 
 Small example script demonstrating how to use the module to fit an ellipse
 to data. We generate random ellipse data with noise and fit an ellipse using both least
@@ -34,5 +33,4 @@ title("Fitting noisy ellipse")
 xlabel(L"$x$");
 ylabel(L"$y$");
 legend();
-display(fig)
 savefig("img/fitted_ellipse.png");

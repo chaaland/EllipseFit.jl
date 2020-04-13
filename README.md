@@ -14,5 +14,20 @@ Most helpful are a handful of plotting utility functions for plotting ellipses w
 # Examples
 Examples of how to use the some of the functions in this module are provided in the [Examples](https://github.com/chaaland/EllipseFit.jl/tree/master/examples) folder
 
+# Tests
+The unit tests can be run from the command line with
+
+```
+# Run inside the EllipseFit.jl directory
+$ julia test/runtests.jl
+```
+
+# Examples
+Example usages of functions in this module are found in the `examples` directory. To run `confidence_ellipses.jl` for example
+```
+# Run inside the EllipseFit.jl directory
+$ julia examples/confidence_ellipses.jl
+```
+
 # Authors
  - **Casey Haaland**
