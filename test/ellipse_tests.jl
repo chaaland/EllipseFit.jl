@@ -17,6 +17,7 @@ using LinearAlgebra
         @test E.conicform.C == 1
         @test E.conicform.D == 0
         @test E.conicform.E == 0
+        @test E.conicform.F == -1
 
         @test E.parametricform.center == c
         @test E.parametricform.semiaxis_lengths == vec([1 1])
@@ -37,6 +38,7 @@ using LinearAlgebra
         @test E.conicform.C == 1/b^2
         @test E.conicform.D == 0
         @test E.conicform.E == 0
+        @test E.conicform.F == -1
 
         @test E.parametricform.center == c
         @test isapprox(E.parametricform.semiaxis_lengths, vec([a, b]))
@@ -58,6 +60,7 @@ using LinearAlgebra
         @test E.conicform.C == 1/b^2
         @test E.conicform.D == 0
         @test E.conicform.E == 0
+        @test E.conicform.F == -1
 
         @test E.parametricform.center == c
         @test isapprox(E.parametricform.semiaxis_lengths, vec([b, a]))
@@ -74,12 +77,13 @@ using LinearAlgebra
         @test E.quadform.S == S
         @test E.quadform.center == c
 
-        negF = 1 - 1/a^2 - 1/b^2
-        @test E.conicform.A == (1 / a^2) / negF
-        @test E.conicform.B == 0
-        @test E.conicform.C == (1 / b^2) / negF
-        @test E.conicform.D == (-2 * 1/a^2) / negF
-        @test E.conicform.E == (-2 * -1/b^2) / negF
+        F = (1/a^2 + 1/b^2) - 1
+
+        @test E.conicform.A / E.conicform.F == (1 / a^2) / F
+        @test E.conicform.B / E.conicform.F == 0
+        @test E.conicform.C / E.conicform.F == (1 / b^2) / F
+        @test E.conicform.D / E.conicform.F == (-2 * 1/a^2) / F
+        @test E.conicform.E / E.conicform.F == (-2 * -1/b^2) / F
 
         @test E.parametricform.center == c
         @test isapprox(E.parametricform.semiaxis_lengths, [a, b])
@@ -96,12 +100,13 @@ using LinearAlgebra
         @test E.quadform.S == S
         @test E.quadform.center == c
 
-        negF = 1 - 1/a^2 - 1/b^2
-        @test E.conicform.A == (1 / a^2) / negF
-        @test E.conicform.B == 0
-        @test E.conicform.C == (1 / b^2) / negF
-        @test E.conicform.D == (-2 * 1/a^2) / negF
-        @test E.conicform.E == (-2 * -1/b^2) / negF
+        F = (1/a^2 + 1/b^2) - 1
+
+        @test E.conicform.A / E.conicform.F == (1 / a^2) / F
+        @test E.conicform.B / E.conicform.F == 0
+        @test E.conicform.C / E.conicform.F == (1 / b^2) / F
+        @test E.conicform.D / E.conicform.F == (-2 * 1/a^2) / F
+        @test E.conicform.E / E.conicform.F == (-2 * -1/b^2) / F
 
         @test E.parametricform.center == c
         @test isapprox(E.parametricform.semiaxis_lengths, [b, a])
@@ -175,12 +180,13 @@ end
         c = vec([1 2])
         E = Ellipse(semiaxes, center=c) 
 
-        negF = 1 - 1 - 2^2
-        @test E.conicform.A == 1 / negF
-        @test E.conicform.B == 0
-        @test E.conicform.C == 1 / negF
-        @test E.conicform.D == -2 * c[1] / negF
-        @test E.conicform.E == -2 * c[2] / negF
+        F = (1 + 2^2) - 1
+
+        @test E.conicform.A / E.conicform.F == 1 / F
+        @test E.conicform.B / E.conicform.F == 0
+        @test E.conicform.C / E.conicform.F == 1 / F
+        @test E.conicform.D / E.conicform.F == -2 * c[1] / F
+        @test E.conicform.E / E.conicform.F == -2 * c[2] / F
 
         @test E.quadform.center == c
         @test E.quadform.S == Matrix(I,2,2)
