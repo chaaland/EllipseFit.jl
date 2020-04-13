@@ -11,7 +11,7 @@ function gaussnewton(
     #= Use the gauss-newton method to find extrema
     
     The Gauss-Newton method is used to approximately solve the non-linear least
-    squares problem (NNLS). The method employs only first order information to 
+    squares problem (NLLS). The method employs only first order information to 
     locate optima
 
     Args :
