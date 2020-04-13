@@ -1,6 +1,5 @@
 using EllipseFit
 using LinearAlgebra
-using Test
 
 
 @testset "Ellipse Quadratic Form Creation" begin

@@ -29,7 +29,7 @@ for p = pvals
     alpha = cquantile(Chisq(dof), (1 - p)/2.0);         # Probability in right tail
     S = precision / alpha;
     
-    confidence_ellipse = Ellipse(S, center=mu)
+    confidence_ellipse = Ellipse(S, mu)
     X_plot = ellipse_to_plot_points(confidence_ellipse) #, n=n_plot_points)
     plot(X_plot[:,1], X_plot[:,2], label="p = $p");
 end
@@ -43,5 +43,4 @@ ylabel(L"$y$",fontsize=14);
 grid(true, which="major");
 grid(true, which="minor",linestyle="--");
 PyPlot.minorticks_on();
-display(fig)
 savefig("img/confidence_ellipsoids.png");

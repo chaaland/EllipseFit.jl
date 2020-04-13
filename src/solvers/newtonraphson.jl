@@ -1,5 +1,4 @@
-include("../utils.jl")
-
+export newtonraphson
 
 function newtonraphson(
     input_dim::T,
