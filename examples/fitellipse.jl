@@ -13,17 +13,17 @@ n_plot_points = 500
 X = noisyellipse([3 2], center = [1 -1], ccw_angle=-pi/3, numpoints=100);
 xinit = vcat([0, 0, 1, 1, 0], randn(size(X,1)));
 ellipse_model_ls = EllipseModel(X, LeastSquares, NormalEquations())
-ellipse_model_nnls = EllipseModel(X, OrthogonalEuclideanDistance, LevenbergMarquardt(xinit=xinit))
+ellipse_model_nlls = EllipseModel(X, OrthogonalEuclideanDistance, LevenbergMarquardt(xinit=xinit))
 ls_fit_ellipse = fit(ellipse_model_ls)
-nnls_fit_ellipse = fit(ellipse_model_nnls)
+nlls_fit_ellipse = fit(ellipse_model_nlls)
 X_fitted_ls = ellipse_to_plot_points(ls_fit_ellipse) #, n=n_plot_points)
-X_fitted_nnls = ellipse_to_plot_points(nnls_fit_ellipse) #, n=n_plot_points)
+X_fitted_nlls = ellipse_to_plot_points(nlls_fit_ellipse) #, n=n_plot_points)
 
 fig = figure(figsize=(7,7))
 
 scatter(X[:,1], X[:,2]);
 plot(X_fitted_ls[:,1], X_fitted_ls[:,2], color="r", label="Least Squares Fit");
-plot(X_fitted_nnls[:,1], X_fitted_nnls[:,2], color="m", label="Nonlinear Least Squares Fit");
+plot(X_fitted_nlls[:,1], X_fitted_nlls[:,2], color="m", label="Nonlinear Least Squares Fit");
 
 xlim([-5,5]);
 ylim([-5,5]);
