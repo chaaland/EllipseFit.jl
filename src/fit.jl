@@ -6,12 +6,12 @@ using LinearAlgebra
 # include("solvers/levenbergmarquardt.jl")
 # include("solvers/gaussnewton.jl")
 
-export EllipseModel, fit
+export EllipseModel, fit, get_residual
 
 mutable struct EllipseModel
     X::Array{Real,2}
     objective
-    solver 
+    solver
 
     function EllipseModel(
         X::Array{T,2},
@@ -42,21 +42,21 @@ end
 function leastsquares(X::Array{T,2}, solver=NormalEquations) where T <: Real
     #= Fit an ellipse to data using least least squares fit
 
-    Set up a least squares problem of the form ||A x - b||^2 where 
+    Set up a least squares problem of the form ||A x - b||^2 where
     A is the matrix of quadratic and linear terms, x is the vector of
-    the coefficients of the ellipse represented in conic form and b is 
-    a vector of all ones 
+    the coefficients of the ellipse represented in conic form and b is
+    a vector of all ones
 
     Args :
         X : N x 2 matrix containing the data to be fit with an ellipse
-            
+
     Returns :
         The coefficients of the ellipse in conic section form
     =#
 
     N, n = size(X)
 
-    if n != 2  
+    if n != 2
         error("Expected an array with second dimension 2")
     end
 
@@ -69,14 +69,14 @@ function leastsquares(X::Array{T,2}, solver=NormalEquations) where T <: Real
     if typeof(solver) == NormalEquations
         # minimise ||Ax - b||_2
         coeffs = A \ b
-        
+
         A = coeffs[1]
         B = coeffs[2]
         C = coeffs[3]
         D = coeffs[4]
         E = coeffs[5]
         F = -b[1] # F = -1
-        
+
         return A, B, C, D, E, F
     elseif typeof(solver) == GradientDescent
         error("Unsupported solver GradientDescent")
@@ -86,9 +86,9 @@ function leastsquares(X::Array{T,2}, solver=NormalEquations) where T <: Real
 end
 
 function orthogonaldist(X::Array{T,2}, solver=LevenbergMarquardt) where T <: Real
-    #= Fit an ellipse by minimizing the orthogonal distance of the points 
+    #= Fit an ellipse by minimizing the orthogonal distance of the points
 
-    Rather than least squares, the ellipse is fit so as to minimize the 
+    Rather than least squares, the ellipse is fit so as to minimize the
     perpendicular distance of all the measured points to an ellipse. This is
     an example of an errors in variables model which accounts for measurement
     error in both the independent and dependent variables
@@ -112,9 +112,9 @@ function orthogonaldist(X::Array{T,2}, solver=LevenbergMarquardt) where T <: Rea
     n_equalities = 2 * N
     if typeof(solver) == LevenbergMarquardt
         thetavals_lm, fvals_lm, gradnorm_lm, lambdavals_lm = levenbergmarquardt(
-            (n_params, n_equalities), 
-            z -> parametric_ellipse(z,X), 
-            jacobian_ellipse; 
+            (n_params, n_equalities),
+            z -> parametric_ellipse(z,X),
+            jacobian_ellipse;
             xinit=solver.xinit,
             max_iters=solver.iterations,
             atol=solver.atol,
@@ -136,7 +136,7 @@ function parametric_ellipse(x::Vector{T}, data) where T <: Real
     semiaxis_lengths = x[3:4]
     ccw_angle = x[5]
     theta = x[6:end]
-    
+
     onaxis_ellipse = diagm(0 => vec(semiaxis_lengths)) * [cos.(theta)'; sin.(theta)']
     U = rotation_mat(ccw_angle)
     rotated_ellipse = U * onaxis_ellipse
@@ -150,18 +150,18 @@ function jacobian_ellipse(x::Vector{T}) where T <: Real
     semiaxis_lengths = vec(x[3:4])
     ccw_angle = x[5]
     theta = vec(x[6:end])
-    
+
     a = semiaxis_lengths[1]
     b = semiaxis_lengths[2]
-    
+
     dxc = repeat([1, 0], length(theta), 1)
     dyc = repeat([0, 1], length(theta), 1)
     da = vec([cos.(ccw_angle)*cos.(theta) sin.(ccw_angle)*cos.(theta)]')
     db = vec([-sin.(ccw_angle)*sin.(theta) cos.(ccw_angle)*sin.(theta)]')
     dalpha = vec([-a*sin.(ccw_angle)*cos.(theta)-b*cos.(ccw_angle)*sin.(theta) a*cos.(ccw_angle)*cos.(theta)-b*sin.(ccw_angle)*sin.(theta)]')
     dtheta = zeros(2*length(theta), length(theta))
-    
-    for i = 1:length(theta) 
+
+    for i = 1:length(theta)
         theta_val = theta[i]
         val1 = -a * cos.(ccw_angle) * sin.(theta_val) - b * sin.(ccw_angle) * cos.(theta_val)
         val2 = -a * sin.(ccw_angle) * sin.(theta_val) + b * cos.(ccw_angle) * cos.(theta_val)
@@ -169,4 +169,17 @@ function jacobian_ellipse(x::Vector{T}) where T <: Real
     end
 
     J = [dxc dyc da db dalpha dtheta]
+end
+
+# Helper function for calculating residual errors
+function get_residual(ellipse::Ellipse, data::Array{T, 2}) where T<:Real
+    # Solution
+    conic_form = ellipse.conicform;
+    sol = [conic_form.A; conic_form.B; conic_form.C; conic_form.D; conic_form.E;
+    conic_form.F];
+    # data
+    x = data[:,1];
+    y = data[:,2];
+    mat_data = [x.^2 x.*y y.^2 x y ones(length(x))];
+    return mat_data * sol;
 end
